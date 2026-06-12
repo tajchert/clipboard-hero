@@ -9,4 +9,14 @@
     <string name="howto_step_3">Paste it anywhere from your keyboard</string>
     <string name="last_copied_title">Last copied</string>
     <string name="copy_again">Copy again</string>
+    <string name="settings_title">Copy settings</string>
+    <string name="format_label">Format</string>
+    <string name="format_original">Original</string>
+    <string name="format_webp">WebP</string>
+    <string name="format_jpeg">JPEG</string>
+    <string name="quality_label">Quality</string>
+    <string name="max_size_label">Max size</string>
+    <string name="max_size_original">Original</string>
+    <string name="max_size_2048">2048 px</string>
+    <string name="max_size_1080">1080 px</string>
 </resources>

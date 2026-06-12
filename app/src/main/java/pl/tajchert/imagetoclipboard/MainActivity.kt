@@ -11,9 +11,14 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import pl.tajchert.imagetoclipboard.settings.CopySettings
+import pl.tajchert.imagetoclipboard.settings.SettingsRepository
 import pl.tajchert.imagetoclipboard.ui.LastCopiedUi
 import pl.tajchert.imagetoclipboard.ui.MainScreen
 import pl.tajchert.imagetoclipboard.ui.Thumbnails
@@ -21,6 +26,7 @@ import pl.tajchert.imagetoclipboard.ui.Thumbnails
 class MainActivity : ComponentActivity() {
 
     private val repository by lazy { ImageClipboardRepository(applicationContext) }
+    private val settingsRepository by lazy { SettingsRepository.create(applicationContext) }
     private var lastCopied by mutableStateOf<LastCopiedUi?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +40,14 @@ class MainActivity : ComponentActivity() {
                 else -> lightColorScheme()
             }
             MaterialTheme(colorScheme = colorScheme) {
-                MainScreen(lastCopied = lastCopied)
+                val settings by settingsRepository.settings.collectAsState(initial = CopySettings())
+                MainScreen(
+                    settings = settings,
+                    onSettingsChange = { updated ->
+                        lifecycleScope.launch { settingsRepository.update(updated) }
+                    },
+                    lastCopied = lastCopied,
+                )
             }
         }
     }
