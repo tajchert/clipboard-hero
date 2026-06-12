@@ -3,6 +3,7 @@ package pl.tajchert.imagetoclipboard
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
@@ -57,8 +58,13 @@ class ShareReceiverActivity : ComponentActivity() {
             copyState = withContext(Dispatchers.IO) {
                 repository.copyToClipboard(sourceUri, intent.type)
                     .map { CopyState.Success(Thumbnails.decode(it.file)) }
+                    .onFailure { Log.w(TAG, "Copy failed for $sourceUri", it) }
                     .getOrDefault(CopyState.Error)
             }
         }
+    }
+
+    private companion object {
+        const val TAG = "ShareReceiver"
     }
 }
