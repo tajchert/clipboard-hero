@@ -9,7 +9,8 @@ enum class MaxDimension(val px: Int?) {
 }
 
 data class CopySettings(
-    val format: OutputFormat = OutputFormat.WEBP,
+    // JPEG over WebP: some paste targets (e.g. Telegram) mishandle WebP clipboard images
+    val format: OutputFormat = OutputFormat.JPEG,
     val quality: Int = 90,
     val maxDimension: MaxDimension = MaxDimension.ORIGINAL,
 )

@@ -17,7 +17,7 @@ original bytes can switch format to Original.
 | Decision | Choice |
 |---|---|
 | Settings exposed | Output format (Original / WebP / JPEG), quality slider (50–100), max dimension (Original / 2048 px / 1080 px) |
-| Defaults | WebP, quality 90, original dimensions |
+| Defaults | JPEG, quality 90, original dimensions (was WebP; changed 2026-06-13 — some paste targets, e.g. Telegram, mishandle WebP clipboard images) |
 | Persistence | Preferences DataStore (`androidx.datastore:datastore-preferences`) |
 | Settings UI | "Copy settings" card on the main screen (no separate screen) |
 | Size feedback | Confirmation card subtitle: `4.2 MB → 780 KB` when size changed, plain `780 KB` otherwise |

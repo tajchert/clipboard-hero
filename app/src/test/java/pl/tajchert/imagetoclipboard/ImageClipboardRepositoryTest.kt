@@ -141,15 +141,15 @@ class ImageClipboardRepositoryTest {
     }
 
     @Test
-    fun `default settings convert png to webp clip`() {
+    fun `default settings convert png to jpeg clip`() {
         val uri = registerSource(pngBytes(256))
 
         val copied = repo.copyToClipboard(uri, "image/png", CopySettings()).getOrThrow()
 
-        assertEquals("clip.webp", copied.file.name)
-        assertEquals("image/webp", copied.mimeType)
+        assertEquals("clip.jpg", copied.file.name)
+        assertEquals("image/jpeg", copied.mimeType)
         val clipboard = context.getSystemService(ClipboardManager::class.java)
-        assertEquals("image/webp", clipboard.primaryClip!!.description.getMimeType(0))
+        assertEquals("image/jpeg", clipboard.primaryClip!!.description.getMimeType(0))
         assertTrue(copied.finalBytes > 0)
         assertTrue(copied.originalBytes >= copied.finalBytes)
     }
