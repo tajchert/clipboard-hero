@@ -6,6 +6,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
+import pl.tajchert.imagetoclipboard.settings.CopySettings
 import java.io.File
 import java.io.IOException
 
@@ -13,30 +14,49 @@ data class CopiedImage(
     val file: File,
     val providerUri: Uri,
     val mimeType: String,
+    val originalBytes: Long,
+    val finalBytes: Long,
 )
 
-class ImageClipboardRepository(private val context: Context) {
+class ImageClipboardRepository(
+    private val context: Context,
+    private val transformer: ImageTransformer = ImageTransformer(),
+) {
 
     private val clipsDir: File
         get() = File(context.filesDir, "clips")
 
-    fun copyToClipboard(sourceUri: Uri, fallbackMimeType: String?): Result<CopiedImage> = runCatching {
+    fun copyToClipboard(
+        sourceUri: Uri,
+        fallbackMimeType: String?,
+        settings: CopySettings,
+    ): Result<CopiedImage> = runCatching {
         val resolver = context.contentResolver
-        val mimeType = resolver.getType(sourceUri)?.takeIf { it != GENERIC_IMAGE_MIME }
+        val sourceMime = resolver.getType(sourceUri)?.takeIf { it != GENERIC_IMAGE_MIME }
             ?: fallbackMimeType?.takeIf { it != GENERIC_IMAGE_MIME }
             ?: GENERIC_IMAGE_MIME
 
         clipsDir.mkdirs()
-        clipsDir.listFiles()?.forEach { it.delete() }
-        val target = File(clipsDir, "clip.${extensionFor(mimeType)}")
-
+        val incoming = File(clipsDir, "incoming.tmp")
         val input = resolver.openInputStream(sourceUri)
             ?: throw IOException("Cannot open input stream for $sourceUri")
         input.use { source ->
-            target.outputStream().use { sink -> source.copyTo(sink) }
+            incoming.outputStream().use { sink -> source.copyTo(sink) }
         }
 
-        val copied = target.toCopiedImage(mimeType)
+        val transformed = transformer.transform(incoming, sourceMime, settings)
+
+        val target = File(clipsDir, "clip.${extensionFor(transformed.mimeType)}")
+        clipsDir.listFiles()?.filter { it != transformed.file }?.forEach { it.delete() }
+        if (!transformed.file.renameTo(target)) throw IOException("Cannot move clip into place")
+
+        val copied = CopiedImage(
+            file = target,
+            providerUri = FileProvider.getUriForFile(context, AUTHORITY, target),
+            mimeType = transformed.mimeType,
+            originalBytes = transformed.originalBytes,
+            finalBytes = transformed.finalBytes,
+        )
         setClip(copied)
         copied
     }
@@ -48,8 +68,15 @@ class ImageClipboardRepository(private val context: Context) {
     }
 
     fun latestImage(): CopiedImage? {
-        val file = clipsDir.listFiles()?.firstOrNull() ?: return null
-        return file.toCopiedImage(mimeTypeFor(file.extension))
+        // a leftover incoming.tmp from a crashed copy must never count as the latest image
+        val file = clipsDir.listFiles()?.firstOrNull { it.name.startsWith("clip.") } ?: return null
+        return CopiedImage(
+            file = file,
+            providerUri = FileProvider.getUriForFile(context, AUTHORITY, file),
+            mimeType = mimeTypeFor(file.extension),
+            originalBytes = file.length(),
+            finalBytes = file.length(),
+        )
     }
 
     private fun setClip(image: CopiedImage) {
@@ -58,11 +85,6 @@ class ImageClipboardRepository(private val context: Context) {
             ClipData.Item(image.providerUri),
         )
         context.getSystemService(ClipboardManager::class.java).setPrimaryClip(clip)
-    }
-
-    private fun File.toCopiedImage(mimeType: String): CopiedImage {
-        val uri = FileProvider.getUriForFile(context, AUTHORITY, this)
-        return CopiedImage(file = this, providerUri = uri, mimeType = mimeType)
     }
 
     private fun extensionFor(mimeType: String): String = MIME_TO_EXTENSION[mimeType] ?: "bin"

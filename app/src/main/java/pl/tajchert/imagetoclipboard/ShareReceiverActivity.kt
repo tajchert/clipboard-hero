@@ -13,8 +13,10 @@ import androidx.compose.runtime.setValue
 import androidx.core.content.IntentCompat
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import pl.tajchert.imagetoclipboard.settings.SettingsRepository
 import pl.tajchert.imagetoclipboard.ui.ConfirmationSheet
 import pl.tajchert.imagetoclipboard.ui.CopyState
 import pl.tajchert.imagetoclipboard.ui.Thumbnails
@@ -56,7 +58,8 @@ class ShareReceiverActivity : ComponentActivity() {
         lifecycleScope.launch {
             val repository = ImageClipboardRepository(applicationContext)
             copyState = withContext(Dispatchers.IO) {
-                repository.copyToClipboard(sourceUri, intent.type)
+                val settings = SettingsRepository.create(applicationContext).settings.first()
+                repository.copyToClipboard(sourceUri, intent.type, settings)
                     .map { CopyState.Success(Thumbnails.decode(it.file)) }
                     .onFailure { Log.w(TAG, "Copy failed for $sourceUri", it) }
                     .getOrDefault(CopyState.Error)
