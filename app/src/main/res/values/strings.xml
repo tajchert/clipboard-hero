@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Image to Clipboard</string>
+    <string name="share_target_label">Copy to clipboard</string>
+    <string name="copied_success">Copied to clipboard</string>
+    <string name="copied_error">Couldn\'t read that image</string>
+    <string name="howto_title">Copy any image to your clipboard</string>
+    <string name="howto_step_1">Share an image from any app</string>
+    <string name="howto_step_2">Pick “Copy to clipboard”</string>
+    <string name="howto_step_3">Paste it anywhere from your keyboard</string>
+    <string name="last_copied_title">Last copied</string>
+    <string name="copy_again">Copy again</string>
+</resources>
