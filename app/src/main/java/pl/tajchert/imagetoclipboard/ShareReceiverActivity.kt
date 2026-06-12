@@ -60,7 +60,7 @@ class ShareReceiverActivity : ComponentActivity() {
             copyState = withContext(Dispatchers.IO) {
                 val settings = SettingsRepository.create(applicationContext).settings.first()
                 repository.copyToClipboard(sourceUri, intent.type, settings)
-                    .map { CopyState.Success(Thumbnails.decode(it.file)) }
+                    .map { CopyState.Success(Thumbnails.decode(it.file), it.originalBytes, it.finalBytes) }
                     .onFailure { Log.w(TAG, "Copy failed for $sourceUri", it) }
                     .getOrDefault(CopyState.Error)
             }

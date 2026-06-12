@@ -1,10 +1,12 @@
 package pl.tajchert.imagetoclipboard.ui
 
 import android.graphics.Bitmap
+import android.text.format.Formatter
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
@@ -34,7 +37,11 @@ import pl.tajchert.imagetoclipboard.R
 
 sealed interface CopyState {
     data object Pending : CopyState
-    data class Success(val thumbnail: Bitmap?) : CopyState
+    data class Success(
+        val thumbnail: Bitmap?,
+        val originalBytes: Long,
+        val finalBytes: Long,
+    ) : CopyState
     data object Error : CopyState
 }
 
@@ -64,11 +71,13 @@ fun ConfirmationSheet(state: CopyState, onDone: () -> Unit) {
             is CopyState.Success -> ResultCard(
                 thumbnail = state.thumbnail,
                 message = stringResource(R.string.copied_success),
+                subtitle = sizeSubtitle(state.originalBytes, state.finalBytes),
                 isError = false,
             )
             CopyState.Error -> ResultCard(
                 thumbnail = null,
                 message = stringResource(R.string.copied_error),
+                subtitle = null,
                 isError = true,
             )
         }
@@ -76,7 +85,20 @@ fun ConfirmationSheet(state: CopyState, onDone: () -> Unit) {
 }
 
 @Composable
-private fun ResultCard(thumbnail: Bitmap?, message: String, isError: Boolean) {
+private fun sizeSubtitle(originalBytes: Long, finalBytes: Long): String? {
+    if (finalBytes <= 0) return null
+    val context = LocalContext.current
+    val final = Formatter.formatShortFileSize(context, finalBytes)
+    // show the arrow only when compression changed the size meaningfully (>1%)
+    return if (originalBytes > 0 && kotlin.math.abs(originalBytes - finalBytes) > originalBytes / 100) {
+        "${Formatter.formatShortFileSize(context, originalBytes)} → $final"
+    } else {
+        final
+    }
+}
+
+@Composable
+private fun ResultCard(thumbnail: Bitmap?, message: String, subtitle: String?, isError: Boolean) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
@@ -114,11 +136,16 @@ private fun ResultCard(thumbnail: Bitmap?, message: String, isError: Boolean) {
                     },
                 )
             }
-            Text(
-                text = message,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(start = 16.dp),
-            )
+            Column(modifier = Modifier.padding(start = 16.dp)) {
+                Text(text = message, style = MaterialTheme.typography.titleMedium)
+                if (subtitle != null) {
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
         }
     }
 }
