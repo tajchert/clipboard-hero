@@ -1,30 +1,54 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="512"
     android:viewportHeight="512">
-    <!-- inset the glyph so it sits within the adaptive safe zone -->
-    <group
-        android:scaleX="0.84"
-        android:scaleY="0.84"
-        android:pivotX="256"
-        android:pivotY="256">
-
-        <!-- ghost "copy" card behind -->
-        <path
-            android:pathData="M154,120 h110 a34,34 0 0 1 34,34 v110 a34,34 0 0 1 -34,34 h-110 a34,34 0 0 1 -34,-34 v-110 a34,34 0 0 1 34,-34 z"
-            android:fillColor="#00000000"
-            android:strokeColor="#FFFFFF"
-            android:strokeAlpha="0.55"
-            android:strokeWidth="16" />
-
-        <!-- front image card with photo, clipped to its rounded shape -->
-        <group>
-            <clip-path android:pathData="M230,192 h130 a38,38 0 0 1 38,38 v130 a38,38 0 0 1 -38,38 h-130 a38,38 0 0 1 -38,-38 v-130 a38,38 0 0 1 38,-38 z" />
-            <path android:pathData="M192,192 h206 v206 h-206 z" android:fillColor="#FFFFFF" />
-            <path android:pathData="M192,398 V356 L250,296 L300,344 L342,300 L398,356 V398 Z" android:fillColor="#0FA978" />
-            <path android:pathData="M192,398 V372 L250,320 L296,360 L344,318 L398,366 V398 Z" android:fillColor="#0B8C63" />
-            <path android:pathData="M227,250 a19,19 0 1 0 38,0 a19,19 0 1 0 -38,0 z" android:fillColor="#FFC233" />
-        </group>
+  <group android:scaleX="0.65"
+      android:scaleY="0.65"
+      android:translateX="89.6"
+      android:translateY="89.6">
+    <path
+        android:pathData="M0,0h512v512h-512z">
+      <aapt:attr name="android:fillColor">
+        <gradient
+            android:startX="0"
+            android:startY="0"
+            android:endX="512"
+            android:endY="512"
+            android:type="linear">
+          <item android:offset="0" android:color="#FF15C0AE"/>
+          <item android:offset="1" android:color="#FF0C9A6E"/>
+        </gradient>
+      </aapt:attr>
+    </path>
+    <path
+        android:pathData="M154,120L264,120A34,34 0,0 1,298 154L298,264A34,34 0,0 1,264 298L154,298A34,34 0,0 1,120 264L120,154A34,34 0,0 1,154 120z"
+        android:strokeAlpha="0.55"
+        android:strokeWidth="16"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"/>
+    <group>
+      <clip-path
+          android:pathData="M230,192L360,192A38,38 0,0 1,398 230L398,360A38,38 0,0 1,360 398L230,398A38,38 0,0 1,192 360L192,230A38,38 0,0 1,230 192z"/>
+      <path
+          android:pathData="M192,192h206v206h-206z"
+          android:fillColor="#FFFFFF"/>
+      <path
+          android:pathData="M246,250m-19,0a19,19 0,1 1,38 0a19,19 0,1 1,-38 0"
+          android:fillColor="#FFC233"/>
+      <path
+          android:pathData="M192,398V356L250,296L300,344L342,300L398,356V398Z"
+          android:fillColor="#0FA978"/>
+      <path
+          android:pathData="M192,398V372L250,320L296,360L344,318L398,366V398Z"
+          android:fillColor="#0B8C63"/>
     </group>
+    <path
+        android:pathData="M230,192L360,192A38,38 0,0 1,398 230L398,360A38,38 0,0 1,360 398L230,398A38,38 0,0 1,192 360L192,230A38,38 0,0 1,230 192z"
+        android:strokeAlpha="0.1"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:strokeColor="#0A6E4E"/>
+  </group>
 </vector>
