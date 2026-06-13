@@ -31,6 +31,9 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
@@ -62,6 +65,7 @@ fun ConfirmationSheet(state: CopyState, onDone: () -> Unit) {
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
+                onClickLabel = stringResource(R.string.action_dismiss),
                 onClick = onDone,
             )
             .padding(16.dp),
@@ -101,7 +105,11 @@ private fun sizeSubtitle(originalBytes: Long, finalBytes: Long): String? {
 @Composable
 private fun ResultCard(thumbnail: Bitmap?, message: String, subtitle: String?, isError: Boolean) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        // The sheet appears asynchronously after the copy completes and auto-
+        // dismisses in ~1.5s, so announce it assertively before it disappears.
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics { liveRegion = LiveRegionMode.Assertive },
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isError) {

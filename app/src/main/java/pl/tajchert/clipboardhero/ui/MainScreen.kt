@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,6 +45,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -121,7 +126,11 @@ private fun HowToSteps() {
 
 @Composable
 private fun Step(number: Int, text: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        // Read the number + instruction as one item rather than two stops.
+        modifier = Modifier.semantics(mergeDescendants = true) {},
+    ) {
         Box(
             modifier = Modifier
                 .size(32.dp)
@@ -177,6 +186,7 @@ private fun SettingsCard(
                         text = "${stringResource(R.string.quality_label)}: ${settings.quality}",
                         style = MaterialTheme.typography.bodyMedium,
                     )
+                    val qualityPercent = stringResource(R.string.quality_percent, settings.quality)
                     Slider(
                         value = settings.quality.toFloat(),
                         onValueChange = {
@@ -184,6 +194,7 @@ private fun SettingsCard(
                         },
                         valueRange = 50f..100f,
                         steps = 9,
+                        modifier = Modifier.semantics { stateDescription = qualityPercent },
                     )
                 }
             }
@@ -199,7 +210,18 @@ private fun SettingsCard(
                 onSelect = { onSettingsChange(settings.copy(maxDimension = it)) },
             )
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                // Whole row is one toggle target labelled by the text; the Switch
+                // is non-focusable (onCheckedChange = null) so it isn't a second stop.
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .toggleable(
+                        value = privacy.historyEnabled,
+                        role = Role.Switch,
+                        onValueChange = { onPrivacyChange(privacy.copy(historyEnabled = it)) },
+                    ),
+            ) {
                 Text(
                     text = stringResource(R.string.keep_history),
                     style = MaterialTheme.typography.bodyMedium,
@@ -207,7 +229,7 @@ private fun SettingsCard(
                 )
                 Switch(
                     checked = privacy.historyEnabled,
-                    onCheckedChange = { onPrivacyChange(privacy.copy(historyEnabled = it)) },
+                    onCheckedChange = null,
                 )
             }
 
@@ -300,6 +322,9 @@ private fun HistoryThumbnail(
     onLongPress: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val description = stringResource(
+        if (isLatest) R.string.cd_history_thumbnail_latest else R.string.cd_history_thumbnail,
+    )
     Box(
         modifier = modifier
             .aspectRatio(1f)
@@ -312,13 +337,21 @@ private fun HistoryThumbnail(
                     Modifier
                 },
             )
-            .combinedClickable(onClick = onTap, onLongClick = onLongPress),
+            // TalkBack: announces the image, then "double-tap to copy" /
+            // "double-tap and hold to delete" from the action labels below.
+            .combinedClickable(
+                onClickLabel = stringResource(R.string.action_recopy),
+                onLongClickLabel = stringResource(R.string.action_delete),
+                onClick = onTap,
+                onLongClick = onLongPress,
+            )
+            .semantics { contentDescription = description },
         contentAlignment = Alignment.Center,
     ) {
         if (item.thumbnail != null) {
             Image(
                 bitmap = item.thumbnail.asImageBitmap(),
-                // tap/long-press semantics come from the clickable container
+                // decorative: the clickable container carries the description + actions
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,

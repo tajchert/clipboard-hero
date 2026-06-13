@@ -21,6 +21,13 @@
     <string name="clear_history">Clear history &amp; clipboard</string>
     <string name="history_cleared">History cleared</string>
     <string name="keep_history">Keep history</string>
+    <!-- Accessibility -->
+    <string name="cd_history_thumbnail">Saved image</string>
+    <string name="cd_history_thumbnail_latest">Most recently copied image</string>
+    <string name="action_recopy">Copy to clipboard again</string>
+    <string name="action_delete">Delete from history</string>
+    <string name="action_dismiss">Dismiss</string>
+    <string name="quality_percent">%1$d percent</string>
     <string name="auto_delete_label">Auto-delete</string>
     <string name="auto_delete_off">Off</string>
     <string name="auto_delete_1h">1 h</string>
