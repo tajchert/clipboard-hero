@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -36,6 +37,23 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         }
     }
 
+    val privacySettings: Flow<PrivacySettings> = dataStore.data
+        .catch { if (it is IOException) emit(emptyPreferences()) else throw it }
+        .map { prefs ->
+            val defaults = PrivacySettings()
+            PrivacySettings(
+                historyEnabled = prefs[KEY_HISTORY_ENABLED] ?: defaults.historyEnabled,
+                autoDelete = prefs[KEY_AUTO_DELETE].toEnumOrNull<AutoDelete>() ?: defaults.autoDelete,
+            )
+        }
+
+    suspend fun updatePrivacy(settings: PrivacySettings) {
+        dataStore.edit { prefs ->
+            prefs[KEY_HISTORY_ENABLED] = settings.historyEnabled
+            prefs[KEY_AUTO_DELETE] = settings.autoDelete.name
+        }
+    }
+
     companion object {
         fun create(context: Context): SettingsRepository =
             SettingsRepository(context.settingsDataStore)
@@ -43,6 +61,8 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         private val KEY_FORMAT = stringPreferencesKey("format")
         private val KEY_QUALITY = intPreferencesKey("quality")
         private val KEY_MAX_DIMENSION = stringPreferencesKey("max_dimension")
+        private val KEY_HISTORY_ENABLED = booleanPreferencesKey("history_enabled")
+        private val KEY_AUTO_DELETE = stringPreferencesKey("auto_delete")
 
         private inline fun <reified T : Enum<T>> String?.toEnumOrNull(): T? =
             this?.let { name -> enumValues<T>().firstOrNull { it.name == name } }

@@ -71,4 +71,32 @@ class SettingsRepositoryTest {
 
         assertEquals(CopySettings(), repo.settings.first())
     }
+
+    @Test
+    fun `privacy defaults when nothing stored`() = runBlocking {
+        val repo = SettingsRepository(newDataStore())
+
+        assertEquals(PrivacySettings(), repo.privacySettings.first())
+    }
+
+    @Test
+    fun `privacy update and read round-trip`() = runBlocking {
+        val repo = SettingsRepository(newDataStore())
+        val wanted = PrivacySettings(historyEnabled = false, autoDelete = AutoDelete.H24)
+
+        repo.updatePrivacy(wanted)
+
+        assertEquals(wanted, repo.privacySettings.first())
+    }
+
+    @Test
+    fun `invalid stored auto-delete falls back to default`() = runBlocking {
+        val dataStore = newDataStore()
+        dataStore.edit { prefs ->
+            prefs[stringPreferencesKey("auto_delete")] = "NEVER_EVER"
+        }
+        val repo = SettingsRepository(dataStore)
+
+        assertEquals(PrivacySettings(), repo.privacySettings.first())
+    }
 }
