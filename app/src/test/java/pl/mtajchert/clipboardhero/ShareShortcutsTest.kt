@@ -1,4 +1,4 @@
-package pl.tajchert.clipboardhero
+package pl.mtajchert.clipboardhero
 
 import android.content.Context
 import androidx.core.content.pm.ShortcutManagerCompat

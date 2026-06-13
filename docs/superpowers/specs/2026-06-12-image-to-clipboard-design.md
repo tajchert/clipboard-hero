@@ -32,7 +32,7 @@ images only and fixes that app's core defects:
 | Main screen | Minimal info screen: how-to steps + last-copied preview with "Copy again" |
 | Min SDK | 29 (Android 10); targetSdk 35 |
 | Stack | Kotlin, Jetpack Compose, Material 3, single module, version catalog |
-| Package | `pl.tajchert.clipboardhero` |
+| Package | `pl.mtajchert.clipboardhero` |
 
 ## Architecture
 
@@ -57,7 +57,7 @@ Single class, no DI framework. Responsibilities:
   - Stream bytes `openInputStream(uri)` → `filesDir/clips/clip.<ext>`. Raw byte
     copy: no decode, no re-encode, full resolution preserved.
   - Delete any previous file in `clips/` (keep only the latest).
-  - Build `FileProvider` URI (authority `pl.tajchert.clipboardhero.fileprovider`),
+  - Build `FileProvider` URI (authority `pl.mtajchert.clipboardhero.fileprovider`),
     `ClipData.newUri(resolver, "Image", providerUri)`, `setPrimaryClip`.
 - `latestImage(): CopiedImage?` — for the main screen's "last copied" card and
   re-copy button.

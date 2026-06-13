@@ -1,4 +1,4 @@
-package pl.tajchert.clipboardhero.ui
+package pl.mtajchert.clipboardhero.ui
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.graphics.Bitmap
@@ -52,12 +52,12 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import pl.tajchert.clipboardhero.R
-import pl.tajchert.clipboardhero.settings.AutoDelete
-import pl.tajchert.clipboardhero.settings.CopySettings
-import pl.tajchert.clipboardhero.settings.MaxDimension
-import pl.tajchert.clipboardhero.settings.OutputFormat
-import pl.tajchert.clipboardhero.settings.PrivacySettings
+import pl.mtajchert.clipboardhero.R
+import pl.mtajchert.clipboardhero.settings.AutoDelete
+import pl.mtajchert.clipboardhero.settings.CopySettings
+import pl.mtajchert.clipboardhero.settings.MaxDimension
+import pl.mtajchert.clipboardhero.settings.OutputFormat
+import pl.mtajchert.clipboardhero.settings.PrivacySettings
 import kotlin.math.roundToInt
 
 @Immutable

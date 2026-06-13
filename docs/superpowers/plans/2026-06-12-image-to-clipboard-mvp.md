@@ -27,14 +27,14 @@ app/src/main/res/values/colors.xml   — icon background color
 app/src/main/res/xml/file_paths.xml  — FileProvider paths
 app/src/main/res/drawable/ic_launcher_foreground.xml
 app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
-app/src/main/java/pl/tajchert/clipboardhero/
+app/src/main/java/pl/mtajchert/clipboardhero/
     ImageClipboardRepository.kt      — core logic: copy bytes, build clip, latestImage()
     ShareReceiverActivity.kt         — share entry point + focus-gated copy
     MainActivity.kt                  — launcher screen host
     ui/Thumbnails.kt                 — downsampled bitmap decode helper
     ui/ConfirmationSheet.kt          — translucent confirmation card UI
     ui/MainScreen.kt                 — how-to + last-copied card UI
-app/src/test/java/pl/tajchert/clipboardhero/
+app/src/test/java/pl/mtajchert/clipboardhero/
     ImageClipboardRepositoryTest.kt
     ShareTargetManifestTest.kt
 ```
@@ -137,11 +137,11 @@ plugins {
 }
 
 android {
-    namespace = "pl.tajchert.clipboardhero"
+    namespace = "pl.mtajchert.clipboardhero"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "pl.tajchert.clipboardhero"
+        applicationId = "pl.mtajchert.clipboardhero"
         minSdk = 29
         targetSdk = 35
         versionCode = 1
@@ -211,7 +211,7 @@ dependencies {
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="pl.tajchert.clipboardhero.fileprovider"
+            android:authorities="pl.mtajchert.clipboardhero.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -301,10 +301,10 @@ dependencies {
 </adaptive-icon>
 ```
 
-- [ ] **Step 9: Write stub `app/src/main/java/pl/tajchert/clipboardhero/MainActivity.kt`**
+- [ ] **Step 9: Write stub `app/src/main/java/pl/mtajchert/clipboardhero/MainActivity.kt`**
 
 ```kotlin
-package pl.tajchert.clipboardhero
+package pl.mtajchert.clipboardhero
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -352,13 +352,13 @@ git add -A && git commit -m "feat: project scaffold — compiling Compose app wi
 ### Task 2: ImageClipboardRepository (TDD)
 
 **Files:**
-- Create: `app/src/test/java/pl/tajchert/clipboardhero/ImageClipboardRepositoryTest.kt`
-- Create: `app/src/main/java/pl/tajchert/clipboardhero/ImageClipboardRepository.kt`
+- Create: `app/src/test/java/pl/mtajchert/clipboardhero/ImageClipboardRepositoryTest.kt`
+- Create: `app/src/main/java/pl/mtajchert/clipboardhero/ImageClipboardRepository.kt`
 
 - [ ] **Step 1: Write the failing tests**
 
 ```kotlin
-package pl.tajchert.clipboardhero
+package pl.mtajchert.clipboardhero
 
 import android.content.ClipboardManager
 import android.content.Context
@@ -447,7 +447,7 @@ class ImageClipboardRepositoryTest {
         val clip = clipboard.primaryClip!!
         assertEquals(1, clip.itemCount)
         assertEquals(copied.providerUri, clip.getItemAt(0).uri)
-        assertEquals("pl.tajchert.clipboardhero.fileprovider", copied.providerUri.authority)
+        assertEquals("pl.mtajchert.clipboardhero.fileprovider", copied.providerUri.authority)
         assertEquals("image/png", clip.description.getMimeType(0))
     }
 
@@ -479,13 +479,13 @@ class ImageClipboardRepositoryTest {
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.clipboardhero.ImageClipboardRepositoryTest"`
+Run: `./gradlew :app:testDebugUnitTest --tests "pl.mtajchert.clipboardhero.ImageClipboardRepositoryTest"`
 Expected: compilation FAILURE — `ImageClipboardRepository` unresolved.
 
 - [ ] **Step 3: Write the implementation**
 
 ```kotlin
-package pl.tajchert.clipboardhero
+package pl.mtajchert.clipboardhero
 
 import android.content.ClipData
 import android.content.ClipDescription
@@ -558,7 +558,7 @@ class ImageClipboardRepository(private val context: Context) {
         MIME_TO_EXTENSION.entries.firstOrNull { it.value == extension }?.key ?: GENERIC_IMAGE_MIME
 
     companion object {
-        const val AUTHORITY = "pl.tajchert.clipboardhero.fileprovider"
+        const val AUTHORITY = "pl.mtajchert.clipboardhero.fileprovider"
         private const val GENERIC_IMAGE_MIME = "image/*"
         private val MIME_TO_EXTENSION = mapOf(
             "image/png" to "png",
@@ -576,7 +576,7 @@ class ImageClipboardRepository(private val context: Context) {
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.clipboardhero.ImageClipboardRepositoryTest"`
+Run: `./gradlew :app:testDebugUnitTest --tests "pl.mtajchert.clipboardhero.ImageClipboardRepositoryTest"`
 Expected: 8 tests PASS. (If `unknown image subtype` test fails on the mime kept: the ClipDescription must carry the original mime string, not the extension-derived one.)
 
 - [ ] **Step 5: Commit**
@@ -590,16 +590,16 @@ git add -A && git commit -m "feat: ImageClipboardRepository — local copy + Fil
 ### Task 3: ShareReceiverActivity + confirmation sheet
 
 **Files:**
-- Create: `app/src/test/java/pl/tajchert/clipboardhero/ShareTargetManifestTest.kt`
-- Create: `app/src/main/java/pl/tajchert/clipboardhero/ShareReceiverActivity.kt`
-- Create: `app/src/main/java/pl/tajchert/clipboardhero/ui/Thumbnails.kt`
-- Create: `app/src/main/java/pl/tajchert/clipboardhero/ui/ConfirmationSheet.kt`
+- Create: `app/src/test/java/pl/mtajchert/clipboardhero/ShareTargetManifestTest.kt`
+- Create: `app/src/main/java/pl/mtajchert/clipboardhero/ShareReceiverActivity.kt`
+- Create: `app/src/main/java/pl/mtajchert/clipboardhero/ui/Thumbnails.kt`
+- Create: `app/src/main/java/pl/mtajchert/clipboardhero/ui/ConfirmationSheet.kt`
 - Modify: `app/src/main/AndroidManifest.xml` (add share activity)
 
 - [ ] **Step 1: Write the failing manifest test**
 
 ```kotlin
-package pl.tajchert.clipboardhero
+package pl.mtajchert.clipboardhero
 
 import android.content.ComponentName
 import android.content.Context
@@ -646,7 +646,7 @@ class ShareTargetManifestTest {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.clipboardhero.ShareTargetManifestTest"`
+Run: `./gradlew :app:testDebugUnitTest --tests "pl.mtajchert.clipboardhero.ShareTargetManifestTest"`
 Expected: compilation FAILURE — `ShareReceiverActivity` unresolved.
 
 - [ ] **Step 3: Add the activity to `app/src/main/AndroidManifest.xml`** (inside `<application>`, before the provider)
@@ -668,10 +668,10 @@ Expected: compilation FAILURE — `ShareReceiverActivity` unresolved.
         </activity>
 ```
 
-- [ ] **Step 4: Write `app/src/main/java/pl/tajchert/clipboardhero/ui/Thumbnails.kt`**
+- [ ] **Step 4: Write `app/src/main/java/pl/mtajchert/clipboardhero/ui/Thumbnails.kt`**
 
 ```kotlin
-package pl.tajchert.clipboardhero.ui
+package pl.mtajchert.clipboardhero.ui
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -694,10 +694,10 @@ object Thumbnails {
 }
 ```
 
-- [ ] **Step 5: Write `app/src/main/java/pl/tajchert/clipboardhero/ui/ConfirmationSheet.kt`**
+- [ ] **Step 5: Write `app/src/main/java/pl/mtajchert/clipboardhero/ui/ConfirmationSheet.kt`**
 
 ```kotlin
-package pl.tajchert.clipboardhero.ui
+package pl.mtajchert.clipboardhero.ui
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
@@ -729,7 +729,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import pl.tajchert.clipboardhero.R
+import pl.mtajchert.clipboardhero.R
 
 sealed interface CopyState {
     data object Pending : CopyState
@@ -825,10 +825,10 @@ private fun ResultCard(thumbnail: Bitmap?, message: String, isError: Boolean) {
 
 Note: `Icons.Filled.Check`/`Warning` live in `androidx.compose.material:material-icons-core`, pulled in transitively by material3. If unresolved, add `implementation("androidx.compose.material:material-icons-core")` (BOM-managed) to `app/build.gradle.kts`.
 
-- [ ] **Step 6: Write `app/src/main/java/pl/tajchert/clipboardhero/ShareReceiverActivity.kt`**
+- [ ] **Step 6: Write `app/src/main/java/pl/mtajchert/clipboardhero/ShareReceiverActivity.kt`**
 
 ```kotlin
-package pl.tajchert.clipboardhero
+package pl.mtajchert.clipboardhero
 
 import android.content.Intent
 import android.net.Uri
@@ -844,9 +844,9 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import pl.tajchert.clipboardhero.ui.ConfirmationSheet
-import pl.tajchert.clipboardhero.ui.CopyState
-import pl.tajchert.clipboardhero.ui.Thumbnails
+import pl.mtajchert.clipboardhero.ui.ConfirmationSheet
+import pl.mtajchert.clipboardhero.ui.CopyState
+import pl.mtajchert.clipboardhero.ui.Thumbnails
 
 class ShareReceiverActivity : ComponentActivity() {
 
@@ -896,7 +896,7 @@ class ShareReceiverActivity : ComponentActivity() {
 
 - [ ] **Step 7: Run tests to verify they pass**
 
-Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.clipboardhero.ShareTargetManifestTest"`
+Run: `./gradlew :app:testDebugUnitTest --tests "pl.mtajchert.clipboardhero.ShareTargetManifestTest"`
 Expected: 2 tests PASS.
 
 Caveat: `setPrimaryClip` inside `copyToClipboard` runs on `Dispatchers.IO` here. `ClipboardManager` is thread-safe; if a `CalledFromWrongThreadException` ever appears on a device, split the repository call so `setPrimaryClip` happens on the main thread.
@@ -917,13 +917,13 @@ git add -A && git commit -m "feat: share target activity with translucent confir
 ### Task 4: Main info screen
 
 **Files:**
-- Create: `app/src/main/java/pl/tajchert/clipboardhero/ui/MainScreen.kt`
-- Modify: `app/src/main/java/pl/tajchert/clipboardhero/MainActivity.kt`
+- Create: `app/src/main/java/pl/mtajchert/clipboardhero/ui/MainScreen.kt`
+- Modify: `app/src/main/java/pl/mtajchert/clipboardhero/MainActivity.kt`
 
-- [ ] **Step 1: Write `app/src/main/java/pl/tajchert/clipboardhero/ui/MainScreen.kt`**
+- [ ] **Step 1: Write `app/src/main/java/pl/mtajchert/clipboardhero/ui/MainScreen.kt`**
 
 ```kotlin
-package pl.tajchert.clipboardhero.ui
+package pl.mtajchert.clipboardhero.ui
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
@@ -956,7 +956,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import pl.tajchert.clipboardhero.R
+import pl.mtajchert.clipboardhero.R
 
 data class LastCopiedUi(val thumbnail: Bitmap?, val onCopyAgain: () -> Unit)
 
@@ -1048,7 +1048,7 @@ private fun LastCopiedCard(lastCopied: LastCopiedUi) {
 - [ ] **Step 2: Rewrite `MainActivity.kt`**
 
 ```kotlin
-package pl.tajchert.clipboardhero
+package pl.mtajchert.clipboardhero
 
 import android.os.Bundle
 import android.widget.Toast
@@ -1063,9 +1063,9 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import pl.tajchert.clipboardhero.ui.LastCopiedUi
-import pl.tajchert.clipboardhero.ui.MainScreen
-import pl.tajchert.clipboardhero.ui.Thumbnails
+import pl.mtajchert.clipboardhero.ui.LastCopiedUi
+import pl.mtajchert.clipboardhero.ui.MainScreen
+import pl.mtajchert.clipboardhero.ui.Thumbnails
 
 class MainActivity : ComponentActivity() {
 
@@ -1138,7 +1138,7 @@ adb devices                       # need at least one device
 adb shell screencap -p /sdcard/test_share.png
 adb shell am start -a android.intent.action.SEND -t image/png \
   --eu android.intent.extra.STREAM "content://media/external/images/media/$(adb shell content query --uri content://media/external/images/media --projection _id | tail -1 | sed 's/.*_id=//')" \
-  -n pl.tajchert.clipboardhero/.ShareReceiverActivity \
+  -n pl.mtajchert.clipboardhero/.ShareReceiverActivity \
   --grant-read-uri-permission
 ```
 

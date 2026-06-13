@@ -1,4 +1,4 @@
-package pl.tajchert.clipboardhero
+package pl.mtajchert.clipboardhero
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

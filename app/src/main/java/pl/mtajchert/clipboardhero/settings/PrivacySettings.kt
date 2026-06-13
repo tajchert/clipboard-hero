@@ -1,4 +1,4 @@
-package pl.tajchert.clipboardhero.settings
+package pl.mtajchert.clipboardhero.settings
 
 enum class AutoDelete(val hours: Int?) {
     OFF(null),

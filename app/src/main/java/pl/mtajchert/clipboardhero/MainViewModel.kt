@@ -1,4 +1,4 @@
-package pl.tajchert.clipboardhero
+package pl.mtajchert.clipboardhero
 
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
@@ -16,13 +16,13 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import pl.tajchert.clipboardhero.di.AppDispatcher
-import pl.tajchert.clipboardhero.di.Dispatcher
-import pl.tajchert.clipboardhero.settings.CopySettings
-import pl.tajchert.clipboardhero.settings.PrivacySettings
-import pl.tajchert.clipboardhero.settings.SettingsRepository
-import pl.tajchert.clipboardhero.ui.HistoryItemUi
-import pl.tajchert.clipboardhero.ui.Thumbnails
+import pl.mtajchert.clipboardhero.di.AppDispatcher
+import pl.mtajchert.clipboardhero.di.Dispatcher
+import pl.mtajchert.clipboardhero.settings.CopySettings
+import pl.mtajchert.clipboardhero.settings.PrivacySettings
+import pl.mtajchert.clipboardhero.settings.SettingsRepository
+import pl.mtajchert.clipboardhero.ui.HistoryItemUi
+import pl.mtajchert.clipboardhero.ui.Thumbnails
 import javax.inject.Inject
 
 /**

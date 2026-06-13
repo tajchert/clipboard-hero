@@ -1,4 +1,4 @@
-package pl.tajchert.clipboardhero
+package pl.mtajchert.clipboardhero
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -13,9 +13,9 @@ import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import pl.tajchert.clipboardhero.settings.CopySettings
-import pl.tajchert.clipboardhero.settings.MaxDimension
-import pl.tajchert.clipboardhero.settings.OutputFormat
+import pl.mtajchert.clipboardhero.settings.CopySettings
+import pl.mtajchert.clipboardhero.settings.MaxDimension
+import pl.mtajchert.clipboardhero.settings.OutputFormat
 import java.io.File
 import kotlin.random.Random
 

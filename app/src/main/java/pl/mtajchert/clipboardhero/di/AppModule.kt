@@ -1,4 +1,4 @@
-package pl.tajchert.clipboardhero.di
+package pl.mtajchert.clipboardhero.di
 
 import android.content.Context
 import dagger.Module
@@ -6,9 +6,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import pl.tajchert.clipboardhero.ImageClipboardRepository
-import pl.tajchert.clipboardhero.ImageTransformer
-import pl.tajchert.clipboardhero.settings.SettingsRepository
+import pl.mtajchert.clipboardhero.ImageClipboardRepository
+import pl.mtajchert.clipboardhero.ImageTransformer
+import pl.mtajchert.clipboardhero.settings.SettingsRepository
 import javax.inject.Singleton
 
 /**

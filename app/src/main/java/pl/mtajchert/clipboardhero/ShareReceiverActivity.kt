@@ -1,4 +1,4 @@
-package pl.tajchert.clipboardhero
+package pl.mtajchert.clipboardhero
 
 import android.content.Intent
 import android.net.Uri
@@ -10,8 +10,8 @@ import androidx.compose.runtime.getValue
 import androidx.core.content.IntentCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import pl.tajchert.clipboardhero.ui.ClipboardHeroTheme
-import pl.tajchert.clipboardhero.ui.ConfirmationSheet
+import pl.mtajchert.clipboardhero.ui.ClipboardHeroTheme
+import pl.mtajchert.clipboardhero.ui.ConfirmationSheet
 
 @AndroidEntryPoint
 class ShareReceiverActivity : ComponentActivity() {

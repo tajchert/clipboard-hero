@@ -1,4 +1,4 @@
-package pl.tajchert.clipboardhero.di
+package pl.mtajchert.clipboardhero.di
 
 import dagger.Module
 import dagger.Provides

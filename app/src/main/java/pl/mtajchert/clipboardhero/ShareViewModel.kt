@@ -1,4 +1,4 @@
-package pl.tajchert.clipboardhero
+package pl.mtajchert.clipboardhero
 
 import android.content.Context
 import android.net.Uri
@@ -14,11 +14,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import pl.tajchert.clipboardhero.di.AppDispatcher
-import pl.tajchert.clipboardhero.di.Dispatcher
-import pl.tajchert.clipboardhero.settings.SettingsRepository
-import pl.tajchert.clipboardhero.ui.CopyState
-import pl.tajchert.clipboardhero.ui.Thumbnails
+import pl.mtajchert.clipboardhero.di.AppDispatcher
+import pl.mtajchert.clipboardhero.di.Dispatcher
+import pl.mtajchert.clipboardhero.settings.SettingsRepository
+import pl.mtajchert.clipboardhero.ui.CopyState
+import pl.mtajchert.clipboardhero.ui.Thumbnails
 import javax.inject.Inject
 
 /**

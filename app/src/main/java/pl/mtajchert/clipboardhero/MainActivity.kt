@@ -1,4 +1,4 @@
-package pl.tajchert.clipboardhero
+package pl.mtajchert.clipboardhero
 
 import android.os.Bundle
 import android.widget.Toast
@@ -13,9 +13,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import pl.tajchert.clipboardhero.ui.ClipboardHeroTheme
-import pl.tajchert.clipboardhero.ui.HistoryUi
-import pl.tajchert.clipboardhero.ui.MainScreen
+import pl.mtajchert.clipboardhero.ui.ClipboardHeroTheme
+import pl.mtajchert.clipboardhero.ui.HistoryUi
+import pl.mtajchert.clipboardhero.ui.MainScreen
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

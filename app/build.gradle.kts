@@ -16,11 +16,11 @@ val keystoreProperties = Properties().apply {
 }
 
 android {
-    namespace = "pl.tajchert.clipboardhero"
+    namespace = "pl.mtajchert.clipboardhero"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "pl.tajchert.clipboardhero"
+        applicationId = "pl.mtajchert.clipboardhero"
         minSdk = 29
         targetSdk = 36
         versionCode = 1

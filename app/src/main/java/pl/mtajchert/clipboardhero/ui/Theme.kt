@@ -1,4 +1,4 @@
-package pl.tajchert.clipboardhero.ui
+package pl.mtajchert.clipboardhero.ui
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

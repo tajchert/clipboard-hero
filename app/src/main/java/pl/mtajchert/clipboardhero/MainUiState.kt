@@ -1,9 +1,9 @@
-package pl.tajchert.clipboardhero
+package pl.mtajchert.clipboardhero
 
 import androidx.compose.runtime.Immutable
-import pl.tajchert.clipboardhero.settings.CopySettings
-import pl.tajchert.clipboardhero.settings.PrivacySettings
-import pl.tajchert.clipboardhero.ui.HistoryItemUi
+import pl.mtajchert.clipboardhero.settings.CopySettings
+import pl.mtajchert.clipboardhero.settings.PrivacySettings
+import pl.mtajchert.clipboardhero.ui.HistoryItemUi
 
 /**
  * Everything [MainScreen] needs in one snapshot. A single state object (rather
