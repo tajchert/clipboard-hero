@@ -17,7 +17,7 @@
 ```
 gradle/libs.versions.toml                          — add datastore, exifinterface
 app/build.gradle.kts                               — add the two deps
-app/src/main/java/pl/tajchert/imagetoclipboard/
+app/src/main/java/pl/tajchert/clipboardhero/
     settings/CopySettings.kt                       — model + enums (new)
     settings/SettingsRepository.kt                 — DataStore wrapper (new)
     ImageTransformer.kt                            — transform pipeline (new)
@@ -27,7 +27,7 @@ app/src/main/java/pl/tajchert/imagetoclipboard/
     ui/ConfirmationSheet.kt                        — size subtitle (modify)
     ui/MainScreen.kt                               — Copy settings card (modify)
 app/src/main/res/values/strings.xml               — new strings (modify)
-app/src/test/java/pl/tajchert/imagetoclipboard/
+app/src/test/java/pl/tajchert/clipboardhero/
     settings/SettingsRepositoryTest.kt             — new
     ImageTransformerTest.kt                        — new
     ImageClipboardRepositoryTest.kt                — update signatures + 2 new tests
@@ -40,9 +40,9 @@ app/src/test/java/pl/tajchert/imagetoclipboard/
 **Files:**
 - Modify: `gradle/libs.versions.toml`
 - Modify: `app/build.gradle.kts`
-- Create: `app/src/main/java/pl/tajchert/imagetoclipboard/settings/CopySettings.kt`
-- Create: `app/src/main/java/pl/tajchert/imagetoclipboard/settings/SettingsRepository.kt`
-- Test: `app/src/test/java/pl/tajchert/imagetoclipboard/settings/SettingsRepositoryTest.kt`
+- Create: `app/src/main/java/pl/tajchert/clipboardhero/settings/CopySettings.kt`
+- Create: `app/src/main/java/pl/tajchert/clipboardhero/settings/SettingsRepository.kt`
+- Test: `app/src/test/java/pl/tajchert/clipboardhero/settings/SettingsRepositoryTest.kt`
 
 - [ ] **Step 1: Add dependencies**
 
@@ -65,7 +65,7 @@ In `app/build.gradle.kts` `dependencies` add:
 - [ ] **Step 2: Write `settings/CopySettings.kt`**
 
 ```kotlin
-package pl.tajchert.imagetoclipboard.settings
+package pl.tajchert.clipboardhero.settings
 
 enum class OutputFormat { ORIGINAL, WEBP, JPEG }
 
@@ -84,10 +84,10 @@ data class CopySettings(
 
 - [ ] **Step 3: Write the failing tests**
 
-`app/src/test/java/pl/tajchert/imagetoclipboard/settings/SettingsRepositoryTest.kt`:
+`app/src/test/java/pl/tajchert/clipboardhero/settings/SettingsRepositoryTest.kt`:
 
 ```kotlin
-package pl.tajchert.imagetoclipboard.settings
+package pl.tajchert.clipboardhero.settings
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
@@ -165,13 +165,13 @@ class SettingsRepositoryTest {
 
 - [ ] **Step 4: Run tests to verify they fail**
 
-Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.imagetoclipboard.settings.SettingsRepositoryTest"`
+Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.clipboardhero.settings.SettingsRepositoryTest"`
 Expected: compilation FAILURE — `SettingsRepository` unresolved.
 
 - [ ] **Step 5: Write `settings/SettingsRepository.kt`**
 
 ```kotlin
-package pl.tajchert.imagetoclipboard.settings
+package pl.tajchert.clipboardhero.settings
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -225,7 +225,7 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
 
 - [ ] **Step 6: Run tests to verify they pass**
 
-Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.imagetoclipboard.settings.SettingsRepositoryTest"`
+Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.clipboardhero.settings.SettingsRepositoryTest"`
 Expected: 3 tests PASS.
 
 - [ ] **Step 7: Commit**
@@ -239,15 +239,15 @@ git add -A && git commit -m "feat: CopySettings model + DataStore-backed Setting
 ### Task 2: ImageTransformer (TDD)
 
 **Files:**
-- Create: `app/src/main/java/pl/tajchert/imagetoclipboard/ImageTransformer.kt`
-- Test: `app/src/test/java/pl/tajchert/imagetoclipboard/ImageTransformerTest.kt`
+- Create: `app/src/main/java/pl/tajchert/clipboardhero/ImageTransformer.kt`
+- Test: `app/src/test/java/pl/tajchert/clipboardhero/ImageTransformerTest.kt`
 
 - [ ] **Step 1: Write the failing tests**
 
 Note: tests generate real image bytes with `Bitmap.compress` (Robolectric 4.14 runs real native graphics, so codecs work). If WebP encoding turns out unsupported in Robolectric, mark that single test `@Ignore` with a comment and verify WebP on the emulator in the final task — do NOT fake the assertion.
 
 ```kotlin
-package pl.tajchert.imagetoclipboard
+package pl.tajchert.clipboardhero
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -264,9 +264,9 @@ import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import pl.tajchert.imagetoclipboard.settings.CopySettings
-import pl.tajchert.imagetoclipboard.settings.MaxDimension
-import pl.tajchert.imagetoclipboard.settings.OutputFormat
+import pl.tajchert.clipboardhero.settings.CopySettings
+import pl.tajchert.clipboardhero.settings.MaxDimension
+import pl.tajchert.clipboardhero.settings.OutputFormat
 import java.io.File
 import kotlin.random.Random
 
@@ -409,13 +409,13 @@ class ImageTransformerTest {
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.imagetoclipboard.ImageTransformerTest"`
+Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.clipboardhero.ImageTransformerTest"`
 Expected: compilation FAILURE — `ImageTransformer` unresolved.
 
 - [ ] **Step 3: Write `ImageTransformer.kt`**
 
 ```kotlin
-package pl.tajchert.imagetoclipboard
+package pl.tajchert.clipboardhero
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -425,8 +425,8 @@ import android.graphics.Matrix
 import android.os.Build
 import android.util.Log
 import androidx.exifinterface.media.ExifInterface
-import pl.tajchert.imagetoclipboard.settings.CopySettings
-import pl.tajchert.imagetoclipboard.settings.OutputFormat
+import pl.tajchert.clipboardhero.settings.CopySettings
+import pl.tajchert.clipboardhero.settings.OutputFormat
 import java.io.File
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -560,7 +560,7 @@ class ImageTransformer {
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.imagetoclipboard.ImageTransformerTest"`
+Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.clipboardhero.ImageTransformerTest"`
 Expected: 7 tests PASS.
 
 - [ ] **Step 5: Commit**
@@ -574,8 +574,8 @@ git add -A && git commit -m "feat: ImageTransformer — format conversion, downs
 ### Task 3: Wire transformer into ImageClipboardRepository (TDD)
 
 **Files:**
-- Modify: `app/src/main/java/pl/tajchert/imagetoclipboard/ImageClipboardRepository.kt`
-- Test: `app/src/test/java/pl/tajchert/imagetoclipboard/ImageClipboardRepositoryTest.kt`
+- Modify: `app/src/main/java/pl/tajchert/clipboardhero/ImageClipboardRepository.kt`
+- Test: `app/src/test/java/pl/tajchert/clipboardhero/ImageClipboardRepositoryTest.kt`
 
 - [ ] **Step 1: Update tests — existing ones pass `noTransform`, two new tests**
 
@@ -583,9 +583,9 @@ In `ImageClipboardRepositoryTest.kt`, add imports:
 ```kotlin
 import android.graphics.Bitmap
 import android.graphics.Color
-import pl.tajchert.imagetoclipboard.settings.CopySettings
-import pl.tajchert.imagetoclipboard.settings.MaxDimension
-import pl.tajchert.imagetoclipboard.settings.OutputFormat
+import pl.tajchert.clipboardhero.settings.CopySettings
+import pl.tajchert.clipboardhero.settings.MaxDimension
+import pl.tajchert.clipboardhero.settings.OutputFormat
 import java.io.ByteArrayOutputStream
 ```
 Add to the class:
@@ -628,7 +628,7 @@ Add two new tests:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.imagetoclipboard.ImageClipboardRepositoryTest"`
+Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.clipboardhero.ImageClipboardRepositoryTest"`
 Expected: compilation FAILURE — `copyToClipboard` has no 3-arg overload.
 
 - [ ] **Step 3: Update `ImageClipboardRepository.kt`**
@@ -636,7 +636,7 @@ Expected: compilation FAILURE — `copyToClipboard` has no 3-arg overload.
 Full new content:
 
 ```kotlin
-package pl.tajchert.imagetoclipboard
+package pl.tajchert.clipboardhero
 
 import android.content.ClipData
 import android.content.ClipDescription
@@ -644,7 +644,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
-import pl.tajchert.imagetoclipboard.settings.CopySettings
+import pl.tajchert.clipboardhero.settings.CopySettings
 import java.io.File
 import java.io.IOException
 
@@ -730,7 +730,7 @@ class ImageClipboardRepository(
         MIME_TO_EXTENSION.entries.firstOrNull { it.value == extension }?.key ?: GENERIC_IMAGE_MIME
 
     companion object {
-        const val AUTHORITY = "pl.tajchert.imagetoclipboard.fileprovider"
+        const val AUTHORITY = "pl.tajchert.clipboardhero.fileprovider"
         private const val GENERIC_IMAGE_MIME = "image/*"
         private val MIME_TO_EXTENSION = mapOf(
             "image/png" to "png",
@@ -753,7 +753,7 @@ This breaks `ShareReceiverActivity` compilation (3-arg call) — fix in the next
 In `ShareReceiverActivity.kt`, add imports:
 ```kotlin
 import kotlinx.coroutines.flow.first
-import pl.tajchert.imagetoclipboard.settings.SettingsRepository
+import pl.tajchert.clipboardhero.settings.SettingsRepository
 ```
 Replace the `lifecycleScope.launch` block with:
 ```kotlin
@@ -786,8 +786,8 @@ git add -A && git commit -m "feat: apply compression settings in the copy pipeli
 ### Task 4: Confirmation card size subtitle
 
 **Files:**
-- Modify: `app/src/main/java/pl/tajchert/imagetoclipboard/ui/ConfirmationSheet.kt`
-- Modify: `app/src/main/java/pl/tajchert/imagetoclipboard/ShareReceiverActivity.kt`
+- Modify: `app/src/main/java/pl/tajchert/clipboardhero/ui/ConfirmationSheet.kt`
+- Modify: `app/src/main/java/pl/tajchert/clipboardhero/ShareReceiverActivity.kt`
 
 - [ ] **Step 1: Extend `CopyState.Success` and render the subtitle**
 
@@ -883,8 +883,8 @@ git add -A && git commit -m "feat: show copied size (and savings) on the confirm
 
 **Files:**
 - Modify: `app/src/main/res/values/strings.xml`
-- Modify: `app/src/main/java/pl/tajchert/imagetoclipboard/ui/MainScreen.kt`
-- Modify: `app/src/main/java/pl/tajchert/imagetoclipboard/MainActivity.kt`
+- Modify: `app/src/main/java/pl/tajchert/clipboardhero/ui/MainScreen.kt`
+- Modify: `app/src/main/java/pl/tajchert/clipboardhero/MainActivity.kt`
 
 - [ ] **Step 1: Add strings**
 
@@ -910,9 +910,9 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Slider
-import pl.tajchert.imagetoclipboard.settings.CopySettings
-import pl.tajchert.imagetoclipboard.settings.MaxDimension
-import pl.tajchert.imagetoclipboard.settings.OutputFormat
+import pl.tajchert.clipboardhero.settings.CopySettings
+import pl.tajchert.clipboardhero.settings.MaxDimension
+import pl.tajchert.clipboardhero.settings.OutputFormat
 import kotlin.math.roundToInt
 ```
 
@@ -1037,8 +1037,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import pl.tajchert.imagetoclipboard.settings.CopySettings
-import pl.tajchert.imagetoclipboard.settings.SettingsRepository
+import pl.tajchert.clipboardhero.settings.CopySettings
+import pl.tajchert.clipboardhero.settings.SettingsRepository
 ```
 Add field:
 ```kotlin

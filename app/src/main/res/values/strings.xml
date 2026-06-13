@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Image to Clipboard</string>
+    <string name="app_name">Clipboard Hero</string>
     <string name="share_target_label">Copy to clipboard</string>
     <string name="copied_success">Copied to clipboard</string>
     <string name="copied_error">Couldn\'t read that image</string>

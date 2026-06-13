@@ -1,4 +1,4 @@
-package pl.tajchert.imagetoclipboard.settings
+package pl.tajchert.clipboardhero.settings
 
 enum class OutputFormat { ORIGINAL, WEBP, JPEG }
 

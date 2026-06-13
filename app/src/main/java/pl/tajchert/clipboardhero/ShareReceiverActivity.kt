@@ -1,4 +1,4 @@
-package pl.tajchert.imagetoclipboard
+package pl.tajchert.clipboardhero
 
 import android.content.Intent
 import android.net.Uri
@@ -16,10 +16,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import pl.tajchert.imagetoclipboard.settings.SettingsRepository
-import pl.tajchert.imagetoclipboard.ui.ConfirmationSheet
-import pl.tajchert.imagetoclipboard.ui.CopyState
-import pl.tajchert.imagetoclipboard.ui.Thumbnails
+import pl.tajchert.clipboardhero.settings.SettingsRepository
+import pl.tajchert.clipboardhero.ui.ConfirmationSheet
+import pl.tajchert.clipboardhero.ui.CopyState
+import pl.tajchert.clipboardhero.ui.Thumbnails
 
 class ShareReceiverActivity : ComponentActivity() {
 

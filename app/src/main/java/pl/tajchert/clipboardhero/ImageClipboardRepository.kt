@@ -1,4 +1,4 @@
-package pl.tajchert.imagetoclipboard
+package pl.tajchert.clipboardhero
 
 import android.content.ClipData
 import android.content.ClipDescription
@@ -6,8 +6,8 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
-import pl.tajchert.imagetoclipboard.settings.CopySettings
-import pl.tajchert.imagetoclipboard.settings.PrivacySettings
+import pl.tajchert.clipboardhero.settings.CopySettings
+import pl.tajchert.clipboardhero.settings.PrivacySettings
 import java.io.File
 import java.io.IOException
 
@@ -148,7 +148,7 @@ class ImageClipboardRepository(
         MIME_TO_EXTENSION.entries.firstOrNull { it.value == extension }?.key ?: GENERIC_IMAGE_MIME
 
     companion object {
-        const val AUTHORITY = "pl.tajchert.imagetoclipboard.fileprovider"
+        const val AUTHORITY = "pl.tajchert.clipboardhero.fileprovider"
         private const val GENERIC_IMAGE_MIME = "image/*"
         private val MIME_TO_EXTENSION = mapOf(
             "image/png" to "png",

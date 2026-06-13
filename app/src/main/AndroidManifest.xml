@@ -8,7 +8,7 @@
         android:fullBackupContent="@xml/backup_rules"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ImageToClipboard">
+        android:theme="@style/Theme.ClipboardHero">
 
         <activity
             android:name=".MainActivity"
@@ -26,7 +26,7 @@
             android:name=".ShareReceiverActivity"
             android:exported="true"
             android:label="@string/share_target_label"
-            android:theme="@style/Theme.ImageToClipboard.Translucent"
+            android:theme="@style/Theme.ClipboardHero.Translucent"
             android:excludeFromRecents="true"
             android:taskAffinity=""
             android:noHistory="true">
@@ -39,7 +39,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="pl.tajchert.imagetoclipboard.fileprovider"
+            android:authorities="pl.tajchert.clipboardhero.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

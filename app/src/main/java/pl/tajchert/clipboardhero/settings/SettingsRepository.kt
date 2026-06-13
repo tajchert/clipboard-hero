@@ -1,4 +1,4 @@
-package pl.tajchert.imagetoclipboard.settings
+package pl.tajchert.clipboardhero.settings
 
 import android.content.Context
 import androidx.datastore.core.DataStore

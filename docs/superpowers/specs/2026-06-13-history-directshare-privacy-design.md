@@ -64,7 +64,7 @@ Three additions that make the app sticky and trustworthy:
 ### Direct Share
 
 - `res/xml/shortcuts.xml` with a `<share-target>`: mime `image/*`, targeting
-  `ShareReceiverActivity`, category `pl.tajchert.imagetoclipboard.SHARE_TARGET`.
+  `ShareReceiverActivity`, category `pl.tajchert.clipboardhero.SHARE_TARGET`.
 - Manifest: `<meta-data android:name="android.app.shortcuts" ...>` on MainActivity.
 - `ShareShortcuts.publish(context)` (small object): pushes one dynamic shortcut
   (id `copy-to-clipboard`, label "Copy to clipboard", app icon, that category,

@@ -1,4 +1,4 @@
-package pl.tajchert.imagetoclipboard.ui
+package pl.tajchert.clipboardhero.ui
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -43,12 +43,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import pl.tajchert.imagetoclipboard.R
-import pl.tajchert.imagetoclipboard.settings.AutoDelete
-import pl.tajchert.imagetoclipboard.settings.CopySettings
-import pl.tajchert.imagetoclipboard.settings.MaxDimension
-import pl.tajchert.imagetoclipboard.settings.OutputFormat
-import pl.tajchert.imagetoclipboard.settings.PrivacySettings
+import pl.tajchert.clipboardhero.R
+import pl.tajchert.clipboardhero.settings.AutoDelete
+import pl.tajchert.clipboardhero.settings.CopySettings
+import pl.tajchert.clipboardhero.settings.MaxDimension
+import pl.tajchert.clipboardhero.settings.OutputFormat
+import pl.tajchert.clipboardhero.settings.PrivacySettings
 import kotlin.math.roundToInt
 
 data class HistoryItemUi(val id: String, val thumbnail: Bitmap?)

@@ -1,4 +1,4 @@
-package pl.tajchert.imagetoclipboard.ui
+package pl.tajchert.clipboardhero.ui
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory

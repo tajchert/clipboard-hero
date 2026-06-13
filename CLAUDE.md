@@ -10,7 +10,7 @@ minSdk 29. Design specs and implementation plans live in `docs/superpowers/`.
 ```bash
 ./gradlew :app:assembleDebug                 # build
 ./gradlew :app:testDebugUnitTest             # all unit tests (Robolectric, no emulator)
-./gradlew :app:testDebugUnitTest --tests "pl.tajchert.imagetoclipboard.ImageTransformerTest"
+./gradlew :app:testDebugUnitTest --tests "pl.tajchert.clipboardhero.ImageTransformerTest"
 ./gradlew :app:lintDebug                     # lint (warnings OK, errors not)
 ./gradlew :app:installDebug                  # install; use adb -s <serial> if several devices
 ```
@@ -81,7 +81,7 @@ minSdk 29. Design specs and implementation plans live in `docs/superpowers/`.
   --grant-read-uri-permission` cannot grant MediaStore URIs** — it produces a
   SecurityException and the error card; that's a harness artifact, not a bug.
 - Success signals: system clipboard overlay appears; Gboard shows the image chip;
-  `adb exec-out run-as pl.tajchert.imagetoclipboard ls files/clips/` shows the clip.
+  `adb exec-out run-as pl.tajchert.clipboardhero ls files/clips/` shows the clip.
 - Emulator paste targets are limited (Messages rejects attachments without MMS,
   Gmail wants an account) — Gboard offering the image chip is the practical proof.
 

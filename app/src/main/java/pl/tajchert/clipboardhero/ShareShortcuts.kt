@@ -1,4 +1,4 @@
-package pl.tajchert.imagetoclipboard
+package pl.tajchert.clipboardhero
 
 import android.content.Context
 import android.content.Intent
@@ -12,7 +12,7 @@ import androidx.core.graphics.drawable.IconCompat
  */
 object ShareShortcuts {
 
-    const val CATEGORY = "pl.tajchert.imagetoclipboard.SHARE_TARGET"
+    const val CATEGORY = "pl.tajchert.clipboardhero.SHARE_TARGET"
     private const val SHORTCUT_ID = "copy-to-clipboard"
 
     fun publish(context: Context) {

@@ -1,4 +1,4 @@
-package pl.tajchert.imagetoclipboard.ui
+package pl.tajchert.clipboardhero.ui
 
 import android.graphics.Bitmap
 import android.text.format.Formatter
@@ -33,7 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import pl.tajchert.imagetoclipboard.R
+import pl.tajchert.clipboardhero.R
 
 sealed interface CopyState {
     data object Pending : CopyState

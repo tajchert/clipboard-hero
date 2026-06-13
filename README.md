@@ -1,4 +1,4 @@
-# Image to Clipboard
+# Clipboard Hero
 
 **Share any image → it's on your clipboard → paste it anywhere.**
 

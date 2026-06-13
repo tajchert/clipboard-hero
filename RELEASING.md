@@ -12,8 +12,8 @@ so an upload-key leak is recoverable via Play Console).
    ```bash
    mkdir -p ~/.android-keys
    keytool -genkeypair -v \
-     -keystore ~/.android-keys/imagetoclipboard.keystore \
-     -alias imagetoclipboard -keyalg RSA -keysize 4096 -validity 10950
+     -keystore ~/.android-keys/clipboardhero.keystore \
+     -alias clipboardhero -keyalg RSA -keysize 4096 -validity 10950
    ```
 
 2. Back up the keystore file **and** both passwords as a secure attachment in
@@ -24,9 +24,9 @@ so an upload-key leak is recoverable via Play Console).
    `git check-ignore keystore.properties`):
 
    ```properties
-   storeFile=/Users/<you>/.android-keys/imagetoclipboard.keystore
+   storeFile=/Users/<you>/.android-keys/clipboardhero.keystore
    storePassword=...
-   keyAlias=imagetoclipboard
+   keyAlias=clipboardhero
    keyPassword=...
    ```
 

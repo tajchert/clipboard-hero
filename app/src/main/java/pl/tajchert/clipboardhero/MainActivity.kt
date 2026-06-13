@@ -1,4 +1,4 @@
-package pl.tajchert.imagetoclipboard
+package pl.tajchert.clipboardhero
 
 import android.graphics.Bitmap
 import android.os.Build
@@ -21,13 +21,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import pl.tajchert.imagetoclipboard.settings.CopySettings
-import pl.tajchert.imagetoclipboard.settings.PrivacySettings
-import pl.tajchert.imagetoclipboard.settings.SettingsRepository
-import pl.tajchert.imagetoclipboard.ui.HistoryItemUi
-import pl.tajchert.imagetoclipboard.ui.HistoryUi
-import pl.tajchert.imagetoclipboard.ui.MainScreen
-import pl.tajchert.imagetoclipboard.ui.Thumbnails
+import pl.tajchert.clipboardhero.settings.CopySettings
+import pl.tajchert.clipboardhero.settings.PrivacySettings
+import pl.tajchert.clipboardhero.settings.SettingsRepository
+import pl.tajchert.clipboardhero.ui.HistoryItemUi
+import pl.tajchert.clipboardhero.ui.HistoryUi
+import pl.tajchert.clipboardhero.ui.MainScreen
+import pl.tajchert.clipboardhero.ui.Thumbnails
 
 class MainActivity : ComponentActivity() {
 

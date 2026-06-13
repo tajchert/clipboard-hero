@@ -12,5 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "image-to-clipboard"
+rootProject.name = "clipboard-hero"
 include(":app")

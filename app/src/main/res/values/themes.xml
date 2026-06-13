@@ -1,7 +1,7 @@
 <resources>
-    <style name="Theme.ImageToClipboard" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.ClipboardHero" parent="android:Theme.Material.Light.NoActionBar" />
 
-    <style name="Theme.ImageToClipboard.Translucent">
+    <style name="Theme.ClipboardHero.Translucent">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowContentOverlay">@null</item>

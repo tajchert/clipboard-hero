@@ -15,7 +15,7 @@
 ## File Structure
 
 ```
-app/src/main/java/pl/tajchert/imagetoclipboard/
+app/src/main/java/pl/tajchert/clipboardhero/
     settings/PrivacySettings.kt        — PrivacySettings + AutoDelete enum (new)
     settings/SettingsRepository.kt     — privacySettings flow + updatePrivacy (modify)
     ImageClipboardRepository.kt        — timestamped clips, RetentionPolicy, prune,
@@ -28,7 +28,7 @@ app/src/main/java/pl/tajchert/imagetoclipboard/
 app/src/main/res/xml/shortcuts.xml     — share-target declaration (new)
 app/src/main/AndroidManifest.xml       — shortcuts meta-data on MainActivity (modify)
 app/src/main/res/values/strings.xml    — new strings (modify)
-app/src/test/java/pl/tajchert/imagetoclipboard/
+app/src/test/java/pl/tajchert/clipboardhero/
     settings/SettingsRepositoryTest.kt — privacy tests (modify)
     ImageClipboardRepositoryTest.kt    — retention/history tests, signature updates (modify)
     ShareShortcutsTest.kt              — dynamic shortcut published (new)
@@ -39,14 +39,14 @@ app/src/test/java/pl/tajchert/imagetoclipboard/
 ### Task 1: PrivacySettings + SettingsRepository (TDD)
 
 **Files:**
-- Create: `app/src/main/java/pl/tajchert/imagetoclipboard/settings/PrivacySettings.kt`
-- Modify: `app/src/main/java/pl/tajchert/imagetoclipboard/settings/SettingsRepository.kt`
-- Test: `app/src/test/java/pl/tajchert/imagetoclipboard/settings/SettingsRepositoryTest.kt`
+- Create: `app/src/main/java/pl/tajchert/clipboardhero/settings/PrivacySettings.kt`
+- Modify: `app/src/main/java/pl/tajchert/clipboardhero/settings/SettingsRepository.kt`
+- Test: `app/src/test/java/pl/tajchert/clipboardhero/settings/SettingsRepositoryTest.kt`
 
 - [ ] **Step 1: Write `settings/PrivacySettings.kt`**
 
 ```kotlin
-package pl.tajchert.imagetoclipboard.settings
+package pl.tajchert.clipboardhero.settings
 
 enum class AutoDelete(val hours: Int?) {
     OFF(null),
@@ -97,7 +97,7 @@ Add inside the class:
 
 - [ ] **Step 3: Run to verify failure**
 
-Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.imagetoclipboard.settings.SettingsRepositoryTest"`
+Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.clipboardhero.settings.SettingsRepositoryTest"`
 Expected: compilation FAILURE — `privacySettings` unresolved.
 
 - [ ] **Step 4: Extend `SettingsRepository.kt`**
@@ -134,7 +134,7 @@ Add import: `androidx.datastore.preferences.core.booleanPreferencesKey`.
 
 - [ ] **Step 5: Run to verify pass**
 
-Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.imagetoclipboard.settings.SettingsRepositoryTest"`
+Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.clipboardhero.settings.SettingsRepositoryTest"`
 Expected: 6 tests PASS.
 
 - [ ] **Step 6: Commit**
@@ -148,8 +148,8 @@ git add -A && git commit -m "feat: PrivacySettings (history toggle, auto-delete)
 ### Task 2: Repository — timestamped clips, retention, history (TDD)
 
 **Files:**
-- Modify: `app/src/main/java/pl/tajchert/imagetoclipboard/ImageClipboardRepository.kt`
-- Test: `app/src/test/java/pl/tajchert/imagetoclipboard/ImageClipboardRepositoryTest.kt`
+- Modify: `app/src/main/java/pl/tajchert/clipboardhero/ImageClipboardRepository.kt`
+- Test: `app/src/test/java/pl/tajchert/clipboardhero/ImageClipboardRepositoryTest.kt`
 
 - [ ] **Step 1: Rewrite the test file**
 
@@ -158,7 +158,7 @@ Replace `ImageClipboardRepositoryTest.kt` entirely (existing tests adapted to th
 history tests):
 
 ```kotlin
-package pl.tajchert.imagetoclipboard
+package pl.tajchert.clipboardhero
 
 import android.content.ClipboardManager
 import android.content.Context
@@ -177,9 +177,9 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
-import pl.tajchert.imagetoclipboard.settings.CopySettings
-import pl.tajchert.imagetoclipboard.settings.MaxDimension
-import pl.tajchert.imagetoclipboard.settings.OutputFormat
+import pl.tajchert.clipboardhero.settings.CopySettings
+import pl.tajchert.clipboardhero.settings.MaxDimension
+import pl.tajchert.clipboardhero.settings.OutputFormat
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -270,7 +270,7 @@ class ImageClipboardRepositoryTest {
         val clip = context.getSystemService(ClipboardManager::class.java).primaryClip!!
         assertEquals(1, clip.itemCount)
         assertEquals(copied.providerUri, clip.getItemAt(0).uri)
-        assertEquals("pl.tajchert.imagetoclipboard.fileprovider", copied.providerUri.authority)
+        assertEquals("pl.tajchert.clipboardhero.fileprovider", copied.providerUri.authority)
         assertEquals("image/png", clip.description.getMimeType(0))
     }
 
@@ -377,13 +377,13 @@ class ImageClipboardRepositoryTest {
 
 - [ ] **Step 2: Run to verify failure**
 
-Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.imagetoclipboard.ImageClipboardRepositoryTest"`
+Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.clipboardhero.ImageClipboardRepositoryTest"`
 Expected: compilation FAILURE — `RetentionPolicy` unresolved, 4-arg `copyToClipboard` missing.
 
 - [ ] **Step 3: Rewrite `ImageClipboardRepository.kt`**
 
 ```kotlin
-package pl.tajchert.imagetoclipboard
+package pl.tajchert.clipboardhero
 
 import android.content.ClipData
 import android.content.ClipDescription
@@ -391,8 +391,8 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
-import pl.tajchert.imagetoclipboard.settings.CopySettings
-import pl.tajchert.imagetoclipboard.settings.PrivacySettings
+import pl.tajchert.clipboardhero.settings.CopySettings
+import pl.tajchert.clipboardhero.settings.PrivacySettings
 import java.io.File
 import java.io.IOException
 
@@ -530,7 +530,7 @@ class ImageClipboardRepository(
         MIME_TO_EXTENSION.entries.firstOrNull { it.value == extension }?.key ?: GENERIC_IMAGE_MIME
 
     companion object {
-        const val AUTHORITY = "pl.tajchert.imagetoclipboard.fileprovider"
+        const val AUTHORITY = "pl.tajchert.clipboardhero.fileprovider"
         private const val GENERIC_IMAGE_MIME = "image/*"
         private val MIME_TO_EXTENSION = mapOf(
             "image/png" to "png",
@@ -586,7 +586,7 @@ And in `MainActivity.kt`, replace `refreshLastCopied` (temporary bridge; full hi
     }
 ```
 
-with imports `pl.tajchert.imagetoclipboard.settings.PrivacySettings` added.
+with imports `pl.tajchert.clipboardhero.settings.PrivacySettings` added.
 
 - [ ] **Step 4: Run all tests**
 
@@ -605,16 +605,16 @@ git add -A && git commit -m "feat: timestamped clip history with retention polic
 
 **Files:**
 - Create: `app/src/main/res/xml/shortcuts.xml`
-- Create: `app/src/main/java/pl/tajchert/imagetoclipboard/ShareShortcuts.kt`
+- Create: `app/src/main/java/pl/tajchert/clipboardhero/ShareShortcuts.kt`
 - Modify: `app/src/main/AndroidManifest.xml`
-- Modify: `app/src/main/java/pl/tajchert/imagetoclipboard/ShareReceiverActivity.kt`
-- Modify: `app/src/main/java/pl/tajchert/imagetoclipboard/MainActivity.kt`
-- Test: `app/src/test/java/pl/tajchert/imagetoclipboard/ShareShortcutsTest.kt`
+- Modify: `app/src/main/java/pl/tajchert/clipboardhero/ShareReceiverActivity.kt`
+- Modify: `app/src/main/java/pl/tajchert/clipboardhero/MainActivity.kt`
+- Test: `app/src/test/java/pl/tajchert/clipboardhero/ShareShortcutsTest.kt`
 
 - [ ] **Step 1: Write the failing test**
 
 ```kotlin
-package pl.tajchert.imagetoclipboard
+package pl.tajchert.clipboardhero
 
 import android.content.Context
 import androidx.core.content.pm.ShortcutManagerCompat
@@ -645,7 +645,7 @@ class ShareShortcutsTest {
 
 - [ ] **Step 2: Run to verify failure**
 
-Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.imagetoclipboard.ShareShortcutsTest"`
+Run: `./gradlew :app:testDebugUnitTest --tests "pl.tajchert.clipboardhero.ShareShortcutsTest"`
 Expected: compilation FAILURE — `ShareShortcuts` unresolved.
 
 - [ ] **Step 3: Write `res/xml/shortcuts.xml`**
@@ -653,9 +653,9 @@ Expected: compilation FAILURE — `ShareShortcuts` unresolved.
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
-    <share-target android:targetClass="pl.tajchert.imagetoclipboard.ShareReceiverActivity">
+    <share-target android:targetClass="pl.tajchert.clipboardhero.ShareReceiverActivity">
         <data android:mimeType="image/*" />
-        <category android:name="pl.tajchert.imagetoclipboard.SHARE_TARGET" />
+        <category android:name="pl.tajchert.clipboardhero.SHARE_TARGET" />
     </share-target>
 </shortcuts>
 ```
@@ -679,7 +679,7 @@ Expected: compilation FAILURE — `ShareShortcuts` unresolved.
 - [ ] **Step 5: Write `ShareShortcuts.kt`**
 
 ```kotlin
-package pl.tajchert.imagetoclipboard
+package pl.tajchert.clipboardhero
 
 import android.content.Context
 import android.content.Intent
@@ -693,7 +693,7 @@ import androidx.core.graphics.drawable.IconCompat
  */
 object ShareShortcuts {
 
-    const val CATEGORY = "pl.tajchert.imagetoclipboard.SHARE_TARGET"
+    const val CATEGORY = "pl.tajchert.clipboardhero.SHARE_TARGET"
     private const val SHORTCUT_ID = "copy-to-clipboard"
 
     fun publish(context: Context) {
@@ -757,8 +757,8 @@ git add -A && git commit -m "feat: direct-share sharing shortcut for share-sheet
 
 **Files:**
 - Modify: `app/src/main/res/values/strings.xml`
-- Modify: `app/src/main/java/pl/tajchert/imagetoclipboard/ui/MainScreen.kt`
-- Modify: `app/src/main/java/pl/tajchert/imagetoclipboard/MainActivity.kt`
+- Modify: `app/src/main/java/pl/tajchert/clipboardhero/ui/MainScreen.kt`
+- Modify: `app/src/main/java/pl/tajchert/clipboardhero/MainActivity.kt`
 
 - [ ] **Step 1: Add strings**
 
@@ -948,8 +948,8 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Switch
-import pl.tajchert.imagetoclipboard.settings.AutoDelete
-import pl.tajchert.imagetoclipboard.settings.PrivacySettings
+import pl.tajchert.clipboardhero.settings.AutoDelete
+import pl.tajchert.clipboardhero.settings.PrivacySettings
 ```
 
 (Remove now-unused `fillMaxWidth`/`FillWidth` imports only if the compiler flags them.)
@@ -957,7 +957,7 @@ import pl.tajchert.imagetoclipboard.settings.PrivacySettings
 - [ ] **Step 3: Rewrite `MainActivity.kt`**
 
 ```kotlin
-package pl.tajchert.imagetoclipboard
+package pl.tajchert.clipboardhero
 
 import android.os.Build
 import android.os.Bundle
@@ -979,13 +979,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import pl.tajchert.imagetoclipboard.settings.CopySettings
-import pl.tajchert.imagetoclipboard.settings.PrivacySettings
-import pl.tajchert.imagetoclipboard.settings.SettingsRepository
-import pl.tajchert.imagetoclipboard.ui.HistoryItemUi
-import pl.tajchert.imagetoclipboard.ui.HistoryUi
-import pl.tajchert.imagetoclipboard.ui.MainScreen
-import pl.tajchert.imagetoclipboard.ui.Thumbnails
+import pl.tajchert.clipboardhero.settings.CopySettings
+import pl.tajchert.clipboardhero.settings.PrivacySettings
+import pl.tajchert.clipboardhero.settings.SettingsRepository
+import pl.tajchert.clipboardhero.ui.HistoryItemUi
+import pl.tajchert.clipboardhero.ui.HistoryUi
+import pl.tajchert.clipboardhero.ui.MainScreen
+import pl.tajchert.clipboardhero.ui.Thumbnails
 
 class MainActivity : ComponentActivity() {
 

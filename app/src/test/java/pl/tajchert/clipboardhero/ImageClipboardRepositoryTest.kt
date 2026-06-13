@@ -1,4 +1,4 @@
-package pl.tajchert.imagetoclipboard
+package pl.tajchert.clipboardhero
 
 import android.content.ClipboardManager
 import android.content.Context
@@ -17,9 +17,9 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
-import pl.tajchert.imagetoclipboard.settings.CopySettings
-import pl.tajchert.imagetoclipboard.settings.MaxDimension
-import pl.tajchert.imagetoclipboard.settings.OutputFormat
+import pl.tajchert.clipboardhero.settings.CopySettings
+import pl.tajchert.clipboardhero.settings.MaxDimension
+import pl.tajchert.clipboardhero.settings.OutputFormat
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -110,7 +110,7 @@ class ImageClipboardRepositoryTest {
         val clip = context.getSystemService(ClipboardManager::class.java).primaryClip!!
         assertEquals(1, clip.itemCount)
         assertEquals(copied.providerUri, clip.getItemAt(0).uri)
-        assertEquals("pl.tajchert.imagetoclipboard.fileprovider", copied.providerUri.authority)
+        assertEquals("pl.tajchert.clipboardhero.fileprovider", copied.providerUri.authority)
         assertEquals("image/png", clip.description.getMimeType(0))
     }
 

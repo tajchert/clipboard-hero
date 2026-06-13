@@ -14,11 +14,11 @@ val keystoreProperties = Properties().apply {
 }
 
 android {
-    namespace = "pl.tajchert.imagetoclipboard"
+    namespace = "pl.tajchert.clipboardhero"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "pl.tajchert.imagetoclipboard"
+        applicationId = "pl.tajchert.clipboardhero"
         minSdk = 29
         targetSdk = 36
         versionCode = 1

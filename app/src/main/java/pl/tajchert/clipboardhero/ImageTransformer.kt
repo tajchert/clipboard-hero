@@ -1,4 +1,4 @@
-package pl.tajchert.imagetoclipboard
+package pl.tajchert.clipboardhero
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -8,8 +8,8 @@ import android.graphics.Matrix
 import android.os.Build
 import android.util.Log
 import androidx.exifinterface.media.ExifInterface
-import pl.tajchert.imagetoclipboard.settings.CopySettings
-import pl.tajchert.imagetoclipboard.settings.OutputFormat
+import pl.tajchert.clipboardhero.settings.CopySettings
+import pl.tajchert.clipboardhero.settings.OutputFormat
 import java.io.File
 import kotlin.math.max
 import kotlin.math.roundToInt
