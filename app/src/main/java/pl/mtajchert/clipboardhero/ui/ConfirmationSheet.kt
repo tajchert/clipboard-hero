@@ -5,6 +5,7 @@ import android.text.format.Formatter
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -121,7 +122,12 @@ private fun ResultCard(thumbnail: Bitmap?, message: String, subtitle: String?, i
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            // Centered so the content clears the system clipboard preview overlay,
+            // which Android draws in the bottom-left corner over our card.
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (thumbnail != null) {
@@ -145,7 +151,10 @@ private fun ResultCard(thumbnail: Bitmap?, message: String, subtitle: String?, i
                     },
                 )
             }
-            Column(modifier = Modifier.padding(start = 16.dp)) {
+            Column(
+                modifier = Modifier.padding(start = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
                 Text(text = message, style = MaterialTheme.typography.titleMedium)
                 if (subtitle != null) {
                     Text(
