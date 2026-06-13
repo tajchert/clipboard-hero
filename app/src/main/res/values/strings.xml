@@ -19,4 +19,13 @@
     <string name="max_size_original">Original</string>
     <string name="max_size_2048">2048 px</string>
     <string name="max_size_1080">1080 px</string>
+    <string name="history_title">History</string>
+    <string name="clear_history">Clear history &amp; clipboard</string>
+    <string name="history_cleared">History cleared</string>
+    <string name="keep_history">Keep history</string>
+    <string name="auto_delete_label">Auto-delete</string>
+    <string name="auto_delete_off">Off</string>
+    <string name="auto_delete_1h">1 h</string>
+    <string name="auto_delete_24h">24 h</string>
+    <string name="auto_delete_7d">7 d</string>
 </resources>

@@ -1,5 +1,6 @@
 package pl.tajchert.imagetoclipboard
 
+import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -16,11 +17,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pl.tajchert.imagetoclipboard.settings.CopySettings
 import pl.tajchert.imagetoclipboard.settings.PrivacySettings
 import pl.tajchert.imagetoclipboard.settings.SettingsRepository
-import pl.tajchert.imagetoclipboard.ui.LastCopiedUi
+import pl.tajchert.imagetoclipboard.ui.HistoryItemUi
+import pl.tajchert.imagetoclipboard.ui.HistoryUi
 import pl.tajchert.imagetoclipboard.ui.MainScreen
 import pl.tajchert.imagetoclipboard.ui.Thumbnails
 
@@ -28,7 +33,9 @@ class MainActivity : ComponentActivity() {
 
     private val repository by lazy { ImageClipboardRepository(applicationContext) }
     private val settingsRepository by lazy { SettingsRepository.create(applicationContext) }
-    private var lastCopied by mutableStateOf<LastCopiedUi?>(null)
+
+    private var historyImages by mutableStateOf<List<CopiedImage>>(emptyList())
+    private var thumbnails by mutableStateOf<Map<String, Bitmap?>>(emptyMap())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,12 +50,27 @@ class MainActivity : ComponentActivity() {
             }
             MaterialTheme(colorScheme = colorScheme) {
                 val settings by settingsRepository.settings.collectAsState(initial = CopySettings())
+                val privacy by settingsRepository.privacySettings.collectAsState(initial = PrivacySettings())
                 MainScreen(
                     settings = settings,
                     onSettingsChange = { updated ->
                         lifecycleScope.launch { settingsRepository.update(updated) }
                     },
-                    lastCopied = lastCopied,
+                    privacy = privacy,
+                    onPrivacyChange = { updated ->
+                        lifecycleScope.launch {
+                            settingsRepository.updatePrivacy(updated)
+                            refreshHistory()
+                        }
+                    },
+                    history = HistoryUi(
+                        items = historyImages.map {
+                            HistoryItemUi(id = it.file.name, thumbnail = thumbnails[it.file.name])
+                        },
+                        onRecopy = ::recopy,
+                        onDelete = ::deleteItem,
+                        onClearAll = ::clearAll,
+                    ),
                 )
             }
         }
@@ -56,20 +78,39 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        refreshLastCopied()
+        lifecycleScope.launch { refreshHistory() }
     }
 
-    private fun refreshLastCopied() {
-        val latest = repository.history(RetentionPolicy.from(PrivacySettings())).firstOrNull()
-        lastCopied = latest?.let { image ->
-            LastCopiedUi(
-                thumbnail = Thumbnails.decode(image.file),
-                onCopyAgain = {
-                    if (repository.recopy(image)) {
-                        Toast.makeText(this, R.string.copied_success, Toast.LENGTH_SHORT).show()
-                    }
-                },
-            )
+    private suspend fun refreshHistory() {
+        val retention = RetentionPolicy.from(settingsRepository.privacySettings.first())
+        val images = withContext(Dispatchers.IO) { repository.history(retention) }
+        val thumbs = withContext(Dispatchers.IO) {
+            images.associate { it.file.name to Thumbnails.decode(it.file, maxDimension = 256) }
+        }
+        historyImages = images
+        thumbnails = thumbs
+    }
+
+    private fun recopy(item: HistoryItemUi) {
+        val image = historyImages.firstOrNull { it.file.name == item.id } ?: return
+        if (repository.recopy(image)) {
+            Toast.makeText(this, R.string.copied_success, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun deleteItem(item: HistoryItemUi) {
+        val image = historyImages.firstOrNull { it.file.name == item.id } ?: return
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) { repository.delete(image) }
+            refreshHistory()
+        }
+    }
+
+    private fun clearAll() {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) { repository.clearAll() }
+            refreshHistory()
+            Toast.makeText(this@MainActivity, R.string.history_cleared, Toast.LENGTH_SHORT).show()
         }
     }
 }

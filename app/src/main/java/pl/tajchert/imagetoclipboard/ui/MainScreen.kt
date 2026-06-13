@@ -1,13 +1,17 @@
 package pl.tajchert.imagetoclipboard.ui
 
 import android.graphics.Bitmap
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,14 +21,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,18 +44,29 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import pl.tajchert.imagetoclipboard.R
+import pl.tajchert.imagetoclipboard.settings.AutoDelete
 import pl.tajchert.imagetoclipboard.settings.CopySettings
 import pl.tajchert.imagetoclipboard.settings.MaxDimension
 import pl.tajchert.imagetoclipboard.settings.OutputFormat
+import pl.tajchert.imagetoclipboard.settings.PrivacySettings
 import kotlin.math.roundToInt
 
-data class LastCopiedUi(val thumbnail: Bitmap?, val onCopyAgain: () -> Unit)
+data class HistoryItemUi(val id: String, val thumbnail: Bitmap?)
+
+data class HistoryUi(
+    val items: List<HistoryItemUi>,
+    val onRecopy: (HistoryItemUi) -> Unit,
+    val onDelete: (HistoryItemUi) -> Unit,
+    val onClearAll: () -> Unit,
+)
 
 @Composable
 fun MainScreen(
     settings: CopySettings,
     onSettingsChange: (CopySettings) -> Unit,
-    lastCopied: LastCopiedUi?,
+    privacy: PrivacySettings,
+    onPrivacyChange: (PrivacySettings) -> Unit,
+    history: HistoryUi,
 ) {
     Scaffold { padding ->
         Column(
@@ -64,9 +83,14 @@ fun MainScreen(
                 fontWeight = FontWeight.Bold,
             )
             HowToSteps()
-            SettingsCard(settings = settings, onSettingsChange = onSettingsChange)
-            if (lastCopied != null) {
-                LastCopiedCard(lastCopied)
+            SettingsCard(
+                settings = settings,
+                onSettingsChange = onSettingsChange,
+                privacy = privacy,
+                onPrivacyChange = onPrivacyChange,
+            )
+            if (history.items.isNotEmpty()) {
+                HistoryCard(history)
             }
         }
     }
@@ -106,7 +130,12 @@ private fun Step(number: Int, text: String) {
 }
 
 @Composable
-private fun SettingsCard(settings: CopySettings, onSettingsChange: (CopySettings) -> Unit) {
+private fun SettingsCard(
+    settings: CopySettings,
+    onSettingsChange: (CopySettings) -> Unit,
+    privacy: PrivacySettings,
+    onPrivacyChange: (PrivacySettings) -> Unit,
+) {
     Card(shape = RoundedCornerShape(20.dp)) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -155,6 +184,30 @@ private fun SettingsCard(settings: CopySettings, onSettingsChange: (CopySettings
                 selected = settings.maxDimension,
                 onSelect = { onSettingsChange(settings.copy(maxDimension = it)) },
             )
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(R.string.keep_history),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f),
+                )
+                Switch(
+                    checked = privacy.historyEnabled,
+                    onCheckedChange = { onPrivacyChange(privacy.copy(historyEnabled = it)) },
+                )
+            }
+
+            LabeledSegmentedRow(
+                label = stringResource(R.string.auto_delete_label),
+                entries = listOf(
+                    AutoDelete.OFF to stringResource(R.string.auto_delete_off),
+                    AutoDelete.H1 to stringResource(R.string.auto_delete_1h),
+                    AutoDelete.H24 to stringResource(R.string.auto_delete_24h),
+                    AutoDelete.D7 to stringResource(R.string.auto_delete_7d),
+                ),
+                selected = privacy.autoDelete,
+                onSelect = { onPrivacyChange(privacy.copy(autoDelete = it)) },
+            )
         }
     }
 }
@@ -184,28 +237,73 @@ private fun <T> LabeledSegmentedRow(
 }
 
 @Composable
-private fun LastCopiedCard(lastCopied: LastCopiedUi) {
+private fun HistoryCard(history: HistoryUi) {
     Card(shape = RoundedCornerShape(20.dp)) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = stringResource(R.string.last_copied_title),
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            if (lastCopied.thumbnail != null) {
-                Image(
-                    bitmap = lastCopied.thumbnail.asImageBitmap(),
-                    contentDescription = stringResource(R.string.last_copied_title),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp)),
-                    contentScale = ContentScale.FillWidth,
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(R.string.history_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f),
                 )
-                Spacer(modifier = Modifier.height(12.dp))
+                IconButton(onClick = history.onClearAll) {
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = stringResource(R.string.clear_history),
+                    )
+                }
             }
-            Button(onClick = lastCopied.onCopyAgain, modifier = Modifier.fillMaxWidth()) {
-                Text(text = stringResource(R.string.copy_again))
+            Spacer(modifier = Modifier.height(8.dp))
+            history.items.chunked(3).forEach { rowItems ->
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    rowItems.forEach { item ->
+                        HistoryThumbnail(
+                            item = item,
+                            isLatest = item.id == history.items.first().id,
+                            onTap = { history.onRecopy(item) },
+                            onLongPress = { history.onDelete(item) },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                    repeat(3 - rowItems.size) { Spacer(modifier = Modifier.weight(1f)) }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun HistoryThumbnail(
+    item: HistoryItemUi,
+    isLatest: Boolean,
+    onTap: () -> Unit,
+    onLongPress: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .then(
+                if (isLatest) {
+                    Modifier.border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
+                } else {
+                    Modifier
+                },
+            )
+            .combinedClickable(onClick = onTap, onLongClick = onLongPress),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (item.thumbnail != null) {
+            Image(
+                bitmap = item.thumbnail.asImageBitmap(),
+                contentDescription = stringResource(R.string.history_title),
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
+            )
         }
     }
 }
