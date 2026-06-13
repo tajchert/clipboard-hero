@@ -1,16 +1,30 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp" android:height="108dp"
-    android:viewportWidth="108" android:viewportHeight="108">
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M38,30h32a4,4 0,0 1,4 4v44a4,4 0,0 1,-4 4H38a4,4 0,0 1,-4 -4V34a4,4 0,0 1,4 -4z" />
-    <path
-        android:fillColor="#1A73E8"
-        android:pathData="M48,26h12a3,3 0,0 1,3 3v3H45v-3a3,3 0,0 1,3 -3z" />
-    <path
-        android:fillColor="#1A73E8"
-        android:pathData="M40,72l8,-12l6,8l5,-6l9,10z" />
-    <path
-        android:fillColor="#1A73E8"
-        android:pathData="M47,46m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+    <!-- inset the glyph so it sits within the adaptive safe zone -->
+    <group
+        android:scaleX="0.84"
+        android:scaleY="0.84"
+        android:pivotX="256"
+        android:pivotY="256">
+
+        <!-- ghost "copy" card behind -->
+        <path
+            android:pathData="M154,120 h110 a34,34 0 0 1 34,34 v110 a34,34 0 0 1 -34,34 h-110 a34,34 0 0 1 -34,-34 v-110 a34,34 0 0 1 34,-34 z"
+            android:fillColor="#00000000"
+            android:strokeColor="#FFFFFF"
+            android:strokeAlpha="0.55"
+            android:strokeWidth="16" />
+
+        <!-- front image card with photo, clipped to its rounded shape -->
+        <group>
+            <clip-path android:pathData="M230,192 h130 a38,38 0 0 1 38,38 v130 a38,38 0 0 1 -38,38 h-130 a38,38 0 0 1 -38,-38 v-130 a38,38 0 0 1 38,-38 z" />
+            <path android:pathData="M192,192 h206 v206 h-206 z" android:fillColor="#FFFFFF" />
+            <path android:pathData="M192,398 V356 L250,296 L300,344 L342,300 L398,356 V398 Z" android:fillColor="#0FA978" />
+            <path android:pathData="M192,398 V372 L250,320 L296,360 L344,318 L398,366 V398 Z" android:fillColor="#0B8C63" />
+            <path android:pathData="M227,250 a19,19 0 1 0 38,0 a19,19 0 1 0 -38,0 z" android:fillColor="#FFC233" />
+        </group>
+    </group>
 </vector>
