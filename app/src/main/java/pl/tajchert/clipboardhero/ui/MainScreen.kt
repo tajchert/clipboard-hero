@@ -1,5 +1,6 @@
 package pl.tajchert.clipboardhero.ui
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -35,6 +36,8 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,6 +45,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import pl.tajchert.clipboardhero.R
 import pl.tajchert.clipboardhero.settings.AutoDelete
@@ -51,14 +55,24 @@ import pl.tajchert.clipboardhero.settings.OutputFormat
 import pl.tajchert.clipboardhero.settings.PrivacySettings
 import kotlin.math.roundToInt
 
+@Immutable
 data class HistoryItemUi(val id: String, val thumbnail: Bitmap?)
 
+@Immutable
 data class HistoryUi(
     val items: List<HistoryItemUi>,
     val onRecopy: (HistoryItemUi) -> Unit,
     val onDelete: (HistoryItemUi) -> Unit,
     val onClearAll: () -> Unit,
 )
+
+/** Card shell shared by the settings and history sections. */
+@Composable
+private fun SectionCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Card(modifier = modifier, shape = RoundedCornerShape(20.dp)) {
+        content()
+    }
+}
 
 @Composable
 fun MainScreen(
@@ -136,7 +150,7 @@ private fun SettingsCard(
     privacy: PrivacySettings,
     onPrivacyChange: (PrivacySettings) -> Unit,
 ) {
-    Card(shape = RoundedCornerShape(20.dp)) {
+    SectionCard {
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -236,9 +250,13 @@ private fun <T> LabeledSegmentedRow(
     }
 }
 
+private const val HISTORY_COLUMNS = 3
+
 @Composable
 private fun HistoryCard(history: HistoryUi) {
-    Card(shape = RoundedCornerShape(20.dp)) {
+    val rows = remember(history.items) { history.items.chunked(HISTORY_COLUMNS) }
+    val latestId = history.items.firstOrNull()?.id
+    SectionCard {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
@@ -254,18 +272,18 @@ private fun HistoryCard(history: HistoryUi) {
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            history.items.chunked(3).forEach { rowItems ->
+            rows.forEach { rowItems ->
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     rowItems.forEach { item ->
                         HistoryThumbnail(
                             item = item,
-                            isLatest = item.id == history.items.first().id,
+                            isLatest = item.id == latestId,
                             onTap = { history.onRecopy(item) },
                             onLongPress = { history.onDelete(item) },
                             modifier = Modifier.weight(1f),
                         )
                     }
-                    repeat(3 - rowItems.size) { Spacer(modifier = Modifier.weight(1f)) }
+                    repeat(HISTORY_COLUMNS - rowItems.size) { Spacer(modifier = Modifier.weight(1f)) }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -308,3 +326,43 @@ private fun HistoryThumbnail(
         }
     }
 }
+
+// region Previews — thumbnails render as empty surface tiles (no bitmaps in preview).
+
+private fun previewHistory(itemCount: Int) = HistoryUi(
+    items = List(itemCount) { HistoryItemUi(id = "clip_$it", thumbnail = null) },
+    onRecopy = {},
+    onDelete = {},
+    onClearAll = {},
+)
+
+@Preview(name = "Main screen — light", showBackground = true)
+@Preview(name = "Main screen — dark", showBackground = true, uiMode = UI_MODE_NIGHT_YES)
+@Composable
+private fun MainScreenPreview() {
+    ClipboardHeroTheme(dynamicColor = false) {
+        MainScreen(
+            settings = CopySettings(),
+            onSettingsChange = {},
+            privacy = PrivacySettings(),
+            onPrivacyChange = {},
+            history = previewHistory(itemCount = 5),
+        )
+    }
+}
+
+@Preview(name = "Main screen — empty history", showBackground = true)
+@Composable
+private fun MainScreenEmptyPreview() {
+    ClipboardHeroTheme(dynamicColor = false) {
+        MainScreen(
+            settings = CopySettings(format = OutputFormat.ORIGINAL, maxDimension = MaxDimension.P1080),
+            onSettingsChange = {},
+            privacy = PrivacySettings(historyEnabled = false),
+            onPrivacyChange = {},
+            history = previewHistory(itemCount = 0),
+        )
+    }
+}
+
+// endregion

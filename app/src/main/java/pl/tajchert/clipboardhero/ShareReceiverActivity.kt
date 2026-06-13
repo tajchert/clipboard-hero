@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -17,6 +16,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pl.tajchert.clipboardhero.settings.SettingsRepository
+import pl.tajchert.clipboardhero.ui.ClipboardHeroTheme
 import pl.tajchert.clipboardhero.ui.ConfirmationSheet
 import pl.tajchert.clipboardhero.ui.CopyState
 import pl.tajchert.clipboardhero.ui.Thumbnails
@@ -29,7 +29,7 @@ class ShareReceiverActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
+            ClipboardHeroTheme {
                 ConfirmationSheet(state = copyState, onDone = ::finish)
             }
         }

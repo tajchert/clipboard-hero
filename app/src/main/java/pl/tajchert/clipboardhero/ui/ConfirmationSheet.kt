@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import pl.tajchert.clipboardhero.R
@@ -147,5 +148,31 @@ private fun ResultCard(thumbnail: Bitmap?, message: String, subtitle: String?, i
                 }
             }
         }
+    }
+}
+
+@Preview(name = "Result — success", showBackground = true)
+@Composable
+private fun ResultCardSuccessPreview() {
+    ClipboardHeroTheme(dynamicColor = false) {
+        ResultCard(
+            thumbnail = null,
+            message = stringResource(R.string.copied_success),
+            subtitle = "2.4 MB → 480 kB",
+            isError = false,
+        )
+    }
+}
+
+@Preview(name = "Result — error", showBackground = true)
+@Composable
+private fun ResultCardErrorPreview() {
+    ClipboardHeroTheme(dynamicColor = false) {
+        ResultCard(
+            thumbnail = null,
+            message = stringResource(R.string.copied_error),
+            subtitle = null,
+            isError = true,
+        )
     }
 }
