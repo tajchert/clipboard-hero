@@ -2,8 +2,9 @@
 
 Android share-target app: receives `ACTION_SEND image/*`, copies the image to
 app-private storage, puts a `ClipData` over its own FileProvider URI on the
-clipboard. Kotlin + Compose (Material 3), single module, no DI framework,
-minSdk 29. Design specs and implementation plans live in `docs/superpowers/`.
+clipboard. Kotlin + Compose (Material 3), single module, Hilt DI + MVVM
+(`ViewModel` + `StateFlow`), minSdk 29. Design specs and implementation plans
+live in `docs/superpowers/`.
 
 ## Commands
 
@@ -17,8 +18,17 @@ minSdk 29. Design specs and implementation plans live in `docs/superpowers/`.
 
 ## Architecture (read in this order)
 
-- `ShareReceiverActivity` — exported entry point. Validates the incoming URI
-  (`isSafeSource`), then copies. Hosts the auto-dismissing `ConfirmationSheet`.
+- DI: `ClipboardHeroApplication` (`@HiltAndroidApp`) + `di/` modules — `AppModule`
+  provides the repositories/transformer as singletons, `DispatchersModule` provides
+  `@Dispatcher`-qualified coroutine dispatchers. Repositories stay constructor-pure
+  (Hilt only owns production wiring), so unit tests still `new` them directly.
+- `ShareReceiverActivity` (`@AndroidEntryPoint`) — exported entry point. Extracts the
+  `EXTRA_STREAM` URI and delegates to `ShareViewModel`, which validates (`isSafeSource`)
+  and copies. Hosts the auto-dismissing `ConfirmationSheet` (state from the VM).
+- `MainActivity` (`@AndroidEntryPoint`) → `MainViewModel` — exposes a single
+  `MainUiState` (settings + privacy + history) `StateFlow`; actions (`recopy`,
+  `delete`, `clearAll`, `update*`, `refreshHistory`) run on `viewModelScope`. Toasts
+  flow back via a `messages: SharedFlow<Int>`.
 - `ImageClipboardRepository` — the core. Streams source bytes to a unique temp
   file, runs `ImageTransformer`, renames to `clips/clip_<epochMillis>.<ext>`,
   prunes per `RetentionPolicy`, sets the clipboard. Also `history()`, `recopy()`,
@@ -35,8 +45,9 @@ minSdk 29. Design specs and implementation plans live in `docs/superpowers/`.
 
 ## Invariants — do not break these
 
-1. **Clipboard writes require window focus on API 29+.** The copy is triggered
-   from `onWindowFocusChanged`, never `onCreate`. Moving it breaks Android 10+.
+1. **Clipboard writes require window focus on API 29+.** `ShareReceiverActivity`
+   calls `ShareViewModel.copy()` from `onWindowFocusChanged`, never `onCreate`
+   (the VM guards against repeat calls). Moving the trigger breaks Android 10+.
 2. **Compression must never break the copy.** Every `ImageTransformer` failure
    path returns the original bytes. Keep `runCatching` + pass-through semantics.
 3. **The size guard:** if re-encoding grows the file and nothing was resized,
@@ -93,3 +104,10 @@ minSdk 29. Design specs and implementation plans live in `docs/superpowers/`.
 - `material-icons-core` is pinned explicitly (the Compose BOM stopped managing it).
 - compileSdk 37 / targetSdk 36 — raising targetSdk opts into new clipboard/share
   runtime behavior; test the full share→paste flow before bumping.
+- **Hilt + Kotlin 2.4:** the root `build.gradle.kts` force-resolves
+  `kotlin-metadata-jvm` to the Kotlin version. Without it Hilt's annotation
+  processor fails (`Provided Metadata instance has version 2.4.0, while maximum
+  supported version is 2.3.0`). Keep the force until Hilt bundles a newer reader.
+- Unit tests pin `application=android.app.Application` in `robolectric.properties`
+  so Robolectric doesn't boot the `@HiltAndroidApp` class — the repo/transformer
+  tests need no DI graph.

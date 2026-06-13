@@ -3,80 +3,43 @@ package pl.tajchert.clipboardhero
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.core.content.IntentCompat
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import pl.tajchert.clipboardhero.settings.SettingsRepository
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dagger.hilt.android.AndroidEntryPoint
 import pl.tajchert.clipboardhero.ui.ClipboardHeroTheme
 import pl.tajchert.clipboardhero.ui.ConfirmationSheet
-import pl.tajchert.clipboardhero.ui.CopyState
-import pl.tajchert.clipboardhero.ui.Thumbnails
 
+@AndroidEntryPoint
 class ShareReceiverActivity : ComponentActivity() {
 
-    private var copyState by mutableStateOf<CopyState>(CopyState.Pending)
-    private var copyStarted = false
+    private val viewModel: ShareViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ClipboardHeroTheme {
-                ConfirmationSheet(state = copyState, onDone = ::finish)
+                val state by viewModel.copyState.collectAsStateWithLifecycle()
+                ConfirmationSheet(state = state, onDone = ::finish)
             }
         }
     }
 
     // Android 10+ only lets the focused app write the clipboard, so the copy
-    // must wait until this window actually holds focus.
+    // must wait until this window actually holds focus. ShareViewModel.copy is
+    // idempotent, so calling it on every focus gain is safe.
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        if (hasFocus && !copyStarted) {
-            copyStarted = true
-            copySharedImage()
-        }
-    }
-
-    private fun copySharedImage() {
-        val sourceUri = if (intent?.action == Intent.ACTION_SEND) {
-            IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java)
-        } else {
-            null
-        }
-        if (sourceUri == null || !sourceUri.isSafeSource()) {
-            copyState = CopyState.Error
-            return
-        }
-        lifecycleScope.launch {
-            val settingsRepository = SettingsRepository.create(applicationContext)
-            val repository = ImageClipboardRepository(applicationContext)
-            copyState = withContext(Dispatchers.IO) {
-                val settings = settingsRepository.settings.first()
-                val retention = RetentionPolicy.from(settingsRepository.privacySettings.first())
-                repository.copyToClipboard(sourceUri, intent.type, settings, retention)
-                    .onSuccess { ShareShortcuts.publish(applicationContext) }
-                    .map { CopyState.Success(Thumbnails.decode(it.file), it.originalBytes, it.finalBytes) }
-                    .onFailure { Log.w(TAG, "Copy failed for $sourceUri", it) }
-                    .getOrDefault(CopyState.Error)
+        if (hasFocus) {
+            val sourceUri = if (intent?.action == Intent.ACTION_SEND) {
+                IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java)
+            } else {
+                null
             }
+            viewModel.copy(sourceUri, intent?.type)
         }
-    }
-
-    // This activity is exported, so the incoming URI is attacker-controlled: only
-    // accept content URIs, and never our own FileProvider (an app could otherwise
-    // trick us into re-publishing our private files onto the clipboard).
-    private fun Uri.isSafeSource(): Boolean =
-        scheme == "content" && authority != ImageClipboardRepository.AUTHORITY
-
-    private companion object {
-        const val TAG = "ShareReceiver"
     }
 }
