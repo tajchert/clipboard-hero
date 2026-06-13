@@ -300,7 +300,8 @@ private fun HistoryThumbnail(
         if (item.thumbnail != null) {
             Image(
                 bitmap = item.thumbnail.asImageBitmap(),
-                contentDescription = stringResource(R.string.history_title),
+                // tap/long-press semantics come from the clickable container
+                contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
             )

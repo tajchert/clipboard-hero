@@ -52,7 +52,8 @@ class ImageClipboardRepository(
             ?: GENERIC_IMAGE_MIME
 
         clipsDir.mkdirs()
-        val incoming = File(clipsDir, "incoming.tmp")
+        // unique staging name so concurrent shares can't clobber each other's bytes
+        val incoming = File.createTempFile("incoming", ".tmp", clipsDir)
         val input = resolver.openInputStream(sourceUri)
             ?: throw IOException("Cannot open input stream for $sourceUri")
         input.use { source ->
@@ -66,7 +67,9 @@ class ImageClipboardRepository(
         while (File(clipsDir, "clip_$timestamp.$extension").exists()) timestamp++
         val target = File(clipsDir, "clip_$timestamp.$extension")
         if (!transformed.file.renameTo(target)) throw IOException("Cannot move clip into place")
-        incoming.delete() // no-op when pass-through already renamed it
+        // pass-through: incoming WAS moved to target, delete is a no-op;
+        // transformed: incoming is the leftover staging file, delete cleans it up
+        incoming.delete()
 
         prune(retention)
 

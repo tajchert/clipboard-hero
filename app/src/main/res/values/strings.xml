@@ -7,8 +7,6 @@
     <string name="howto_step_1">Share an image from any app</string>
     <string name="howto_step_2">Pick “Copy to clipboard”</string>
     <string name="howto_step_3">Paste it anywhere from your keyboard</string>
-    <string name="last_copied_title">Last copied</string>
-    <string name="copy_again">Copy again</string>
     <string name="settings_title">Copy settings</string>
     <string name="format_label">Format</string>
     <string name="format_original">Original</string>

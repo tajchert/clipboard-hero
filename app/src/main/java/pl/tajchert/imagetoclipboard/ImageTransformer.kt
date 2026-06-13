@@ -44,7 +44,8 @@ class ImageTransformer {
 
             val encoding = encodingFor(settings.format, sourceMime)
             val prepared = if (encoding.mimeType == "image/jpeg") flattenAlpha(scaled) else scaled
-            val output = File(source.parentFile, "transformed.${encoding.extension}")
+            // unique name so concurrent transforms in the same directory can't collide
+            val output = File.createTempFile("transformed", ".${encoding.extension}", source.parentFile)
             output.outputStream().use { sink ->
                 if (!prepared.compress(encoding.format, settings.quality, sink)) {
                     error("Bitmap.compress returned false for ${encoding.mimeType}")

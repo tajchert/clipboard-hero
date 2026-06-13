@@ -51,7 +51,7 @@ class ShareReceiverActivity : ComponentActivity() {
         } else {
             null
         }
-        if (sourceUri == null) {
+        if (sourceUri == null || !sourceUri.isSafeSource()) {
             copyState = CopyState.Error
             return
         }
@@ -69,6 +69,12 @@ class ShareReceiverActivity : ComponentActivity() {
             }
         }
     }
+
+    // This activity is exported, so the incoming URI is attacker-controlled: only
+    // accept content URIs, and never our own FileProvider (an app could otherwise
+    // trick us into re-publishing our private files onto the clipboard).
+    private fun Uri.isSafeSource(): Boolean =
+        scheme == "content" && authority != ImageClipboardRepository.AUTHORITY
 
     private companion object {
         const val TAG = "ShareReceiver"
