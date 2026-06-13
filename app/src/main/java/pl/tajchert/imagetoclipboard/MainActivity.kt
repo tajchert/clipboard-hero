@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import pl.tajchert.imagetoclipboard.settings.CopySettings
+import pl.tajchert.imagetoclipboard.settings.PrivacySettings
 import pl.tajchert.imagetoclipboard.settings.SettingsRepository
 import pl.tajchert.imagetoclipboard.ui.LastCopiedUi
 import pl.tajchert.imagetoclipboard.ui.MainScreen
@@ -58,7 +59,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun refreshLastCopied() {
-        val latest = repository.latestImage()
+        val latest = repository.history(RetentionPolicy.from(PrivacySettings())).firstOrNull()
         lastCopied = latest?.let { image ->
             LastCopiedUi(
                 thumbnail = Thumbnails.decode(image.file),

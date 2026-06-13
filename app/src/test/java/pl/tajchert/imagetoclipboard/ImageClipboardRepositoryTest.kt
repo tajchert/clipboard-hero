@@ -9,7 +9,6 @@ import androidx.core.content.FileProvider
 import androidx.test.core.app.ApplicationProvider
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -31,6 +30,7 @@ class ImageClipboardRepositoryTest {
 
     private lateinit var context: Context
     private lateinit var repo: ImageClipboardRepository
+    private var now = 1_000_000L
 
     @Before
     fun setUp() {
@@ -41,16 +41,29 @@ class ImageClipboardRepositoryTest {
             (get(null) as MutableMap<*, *>).clear()
         }
         context = ApplicationProvider.getApplicationContext()
-        repo = ImageClipboardRepository(context)
+        repo = ImageClipboardRepository(context, clock = { now })
     }
 
-    private fun registerSource(bytes: ByteArray, uri: String = "content://test.source/img"): Uri {
-        val sourceUri = Uri.parse(uri)
+    private var uriCounter = 0
+
+    private fun registerSource(bytes: ByteArray): Uri {
+        val sourceUri = Uri.parse("content://test.source/img${uriCounter++}")
         shadowOf(context.contentResolver).registerInputStream(sourceUri, ByteArrayInputStream(bytes))
         return sourceUri
     }
 
     private val noTransform = CopySettings(format = OutputFormat.ORIGINAL, maxDimension = MaxDimension.ORIGINAL)
+    private val keepAll = RetentionPolicy(maxItems = 10, ttlMillis = null)
+
+    private fun copy(
+        bytes: ByteArray = byteArrayOf(1, 2, 3),
+        mime: String = "image/png",
+        settings: CopySettings = noTransform,
+        retention: RetentionPolicy = keepAll,
+    ): CopiedImage {
+        now += 1 // unique timestamp per copy
+        return repo.copyToClipboard(registerSource(bytes), mime, settings, retention).getOrThrow()
+    }
 
     /** Noise PNG: large losslessly, so lossy conversion reliably shrinks it (avoids the size guard). */
     private fun pngBytes(size: Int = 128): ByteArray {
@@ -62,54 +75,39 @@ class ImageClipboardRepositoryTest {
         return ByteArrayOutputStream().also { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }.toByteArray()
     }
 
+    private val clipsDir get() = File(context.filesDir, "clips")
+
     @Test
     fun `copies bytes exactly without re-encoding`() {
         val bytes = ByteArray(50_000) { (it % 251).toByte() }
-        val uri = registerSource(bytes)
 
-        val result = repo.copyToClipboard(uri, "image/png", noTransform)
+        val copied = copy(bytes)
 
-        val copied = result.getOrThrow()
         assertArrayEquals(bytes, copied.file.readBytes())
     }
 
     @Test
-    fun `maps mime type to file extension`() {
-        val uri = registerSource(byteArrayOf(1, 2, 3))
+    fun `clip file is timestamped with mime-mapped extension`() {
+        val copied = copy(mime = "image/jpeg")
 
-        val copied = repo.copyToClipboard(uri, "image/jpeg", noTransform).getOrThrow()
-
-        assertEquals("clip.jpg", copied.file.name)
+        assertEquals("clip_$now.jpg", copied.file.name)
         assertEquals("image/jpeg", copied.mimeType)
+        assertEquals(now, copied.timestamp)
     }
 
     @Test
     fun `unknown image subtype falls back to bin extension and keeps mime`() {
-        val uri = registerSource(byteArrayOf(1, 2, 3))
+        val copied = copy(mime = "image/x-weird!type")
 
-        val copied = repo.copyToClipboard(uri, "image/x-weird!type", noTransform).getOrThrow()
-
-        assertEquals("clip.bin", copied.file.name)
+        assertTrue(copied.file.name.endsWith(".bin"))
         assertEquals("image/x-weird!type", copied.mimeType)
     }
 
     @Test
-    fun `keeps only the latest copied file`() {
-        repo.copyToClipboard(registerSource(byteArrayOf(1), "content://test.source/a"), "image/png", noTransform).getOrThrow()
-        repo.copyToClipboard(registerSource(byteArrayOf(2), "content://test.source/b"), "image/jpeg", noTransform).getOrThrow()
-
-        val clipsDir = File(context.filesDir, "clips")
-        assertEquals(listOf("clip.jpg"), clipsDir.listFiles()!!.map { it.name })
-    }
-
-    @Test
     fun `puts our FileProvider uri with correct mime on the clipboard`() {
-        val uri = registerSource(byteArrayOf(1, 2, 3))
+        val copied = copy(mime = "image/png")
 
-        val copied = repo.copyToClipboard(uri, "image/png", noTransform).getOrThrow()
-
-        val clipboard = context.getSystemService(ClipboardManager::class.java)
-        val clip = clipboard.primaryClip!!
+        val clip = context.getSystemService(ClipboardManager::class.java).primaryClip!!
         assertEquals(1, clip.itemCount)
         assertEquals(copied.providerUri, clip.getItemAt(0).uri)
         assertEquals("pl.tajchert.imagetoclipboard.fileprovider", copied.providerUri.authority)
@@ -118,48 +116,103 @@ class ImageClipboardRepositoryTest {
 
     @Test
     fun `unreadable uri returns failure`() {
-        val result = repo.copyToClipboard(Uri.parse("content://nope/missing"), "image/png", noTransform)
+        val result = repo.copyToClipboard(Uri.parse("content://nope/missing"), "image/png", noTransform, keepAll)
 
         assertTrue(result.isFailure)
     }
 
     @Test
-    fun `latestImage returns null when nothing copied`() {
-        assertNull(repo.latestImage())
-    }
-
-    @Test
-    fun `latestImage returns the stored image after a copy`() {
-        val uri = registerSource(byteArrayOf(9, 9, 9))
-        repo.copyToClipboard(uri, "image/webp", noTransform).getOrThrow()
-
-        val latest = repo.latestImage()
-
-        assertNotNull(latest)
-        assertEquals("clip.webp", latest!!.file.name)
-        assertEquals("image/webp", latest.mimeType)
-    }
-
-    @Test
     fun `default settings convert png to jpeg clip`() {
-        val uri = registerSource(pngBytes(256))
+        val copied = copy(pngBytes(256), settings = CopySettings())
 
-        val copied = repo.copyToClipboard(uri, "image/png", CopySettings()).getOrThrow()
-
-        assertEquals("clip.jpg", copied.file.name)
+        assertTrue(copied.file.name.endsWith(".jpg"))
         assertEquals("image/jpeg", copied.mimeType)
-        val clipboard = context.getSystemService(ClipboardManager::class.java)
-        assertEquals("image/jpeg", clipboard.primaryClip!!.description.getMimeType(0))
-        assertTrue(copied.finalBytes > 0)
+        assertEquals(
+            "image/jpeg",
+            context.getSystemService(ClipboardManager::class.java).primaryClip!!.description.getMimeType(0),
+        )
         assertTrue(copied.originalBytes >= copied.finalBytes)
     }
 
     @Test
-    fun `clips dir holds exactly one file after transform`() {
-        repo.copyToClipboard(registerSource(pngBytes(), "content://test.source/a"), "image/png", CopySettings()).getOrThrow()
-        repo.copyToClipboard(registerSource(pngBytes(), "content://test.source/b"), "image/png", noTransform).getOrThrow()
+    fun `history returns newest first`() {
+        copy(byteArrayOf(1))
+        copy(byteArrayOf(2))
+        val newest = copy(byteArrayOf(3))
 
-        val clipsDir = File(context.filesDir, "clips")
-        assertEquals(listOf("clip.png"), clipsDir.listFiles()!!.map { it.name })
+        val history = repo.history(keepAll)
+
+        assertEquals(3, history.size)
+        assertEquals(newest.file.name, history[0].file.name)
+        assertTrue(history[0].timestamp > history[1].timestamp)
+        assertTrue(history[1].timestamp > history[2].timestamp)
+    }
+
+    @Test
+    fun `history empty when nothing copied`() {
+        assertEquals(emptyList<CopiedImage>(), repo.history(keepAll))
+    }
+
+    @Test
+    fun `eleventh copy evicts the oldest`() {
+        val first = copy(byteArrayOf(0))
+        repeat(10) { copy(byteArrayOf((it + 1).toByte())) }
+
+        val history = repo.history(keepAll)
+
+        assertEquals(10, history.size)
+        assertTrue(history.none { it.file.name == first.file.name })
+    }
+
+    @Test
+    fun `history off keeps only the latest`() {
+        val single = RetentionPolicy(maxItems = 1, ttlMillis = null)
+        copy(byteArrayOf(1), retention = single)
+        val latest = copy(byteArrayOf(2), retention = single)
+
+        assertEquals(listOf(latest.file.name), clipsDir.listFiles()!!.map { it.name })
+    }
+
+    @Test
+    fun `ttl expiry prunes on read`() {
+        val ttl = RetentionPolicy(maxItems = 10, ttlMillis = 3_600_000L)
+        copy(byteArrayOf(1), retention = ttl)
+
+        now += 3_600_001L
+
+        assertEquals(emptyList<CopiedImage>(), repo.history(ttl))
+        assertEquals(0, clipsDir.listFiles()!!.size)
+    }
+
+    @Test
+    fun `legacy clip file appears in history`() {
+        clipsDir.mkdirs()
+        File(clipsDir, "clip.png").writeBytes(byteArrayOf(7))
+
+        val history = repo.history(keepAll)
+
+        assertEquals(1, history.size)
+        assertEquals("image/png", history[0].mimeType)
+    }
+
+    @Test
+    fun `delete removes a single item`() {
+        val a = copy(byteArrayOf(1))
+        copy(byteArrayOf(2))
+
+        repo.delete(a)
+
+        assertEquals(1, repo.history(keepAll).size)
+    }
+
+    @Test
+    fun `clearAll removes files and clears the clipboard`() {
+        copy(byteArrayOf(1))
+        copy(byteArrayOf(2))
+
+        repo.clearAll()
+
+        assertEquals(emptyList<CopiedImage>(), repo.history(keepAll))
+        assertNull(context.getSystemService(ClipboardManager::class.java).primaryClip)
     }
 }

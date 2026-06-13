@@ -56,10 +56,12 @@ class ShareReceiverActivity : ComponentActivity() {
             return
         }
         lifecycleScope.launch {
+            val settingsRepository = SettingsRepository.create(applicationContext)
             val repository = ImageClipboardRepository(applicationContext)
             copyState = withContext(Dispatchers.IO) {
-                val settings = SettingsRepository.create(applicationContext).settings.first()
-                repository.copyToClipboard(sourceUri, intent.type, settings)
+                val settings = settingsRepository.settings.first()
+                val retention = RetentionPolicy.from(settingsRepository.privacySettings.first())
+                repository.copyToClipboard(sourceUri, intent.type, settings, retention)
                     .map { CopyState.Success(Thumbnails.decode(it.file), it.originalBytes, it.finalBytes) }
                     .onFailure { Log.w(TAG, "Copy failed for $sourceUri", it) }
                     .getOrDefault(CopyState.Error)
