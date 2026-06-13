@@ -62,6 +62,7 @@ class ShareReceiverActivity : ComponentActivity() {
                 val settings = settingsRepository.settings.first()
                 val retention = RetentionPolicy.from(settingsRepository.privacySettings.first())
                 repository.copyToClipboard(sourceUri, intent.type, settings, retention)
+                    .onSuccess { ShareShortcuts.publish(applicationContext) }
                     .map { CopyState.Success(Thumbnails.decode(it.file), it.originalBytes, it.finalBytes) }
                     .onFailure { Log.w(TAG, "Copy failed for $sourceUri", it) }
                     .getOrDefault(CopyState.Error)
