@@ -53,7 +53,17 @@ class ShareViewModel @Inject constructor(
                 val retention = RetentionPolicy.from(settingsRepository.privacySettings.first())
                 repository.copyToClipboard(sourceUri, mimeType, settings, retention)
                     .onSuccess { ShareShortcuts.publish(context) }
-                    .map { CopyState.Success(Thumbnails.decode(it.file), it.originalBytes, it.finalBytes) }
+                    .map { result ->
+                        if (settings.showConfirmation) {
+                            CopyState.Success(
+                                Thumbnails.decode(result.file),
+                                result.originalBytes,
+                                result.finalBytes,
+                            )
+                        } else {
+                            CopyState.SilentSuccess
+                        }
+                    }
                     .onFailure { Log.w(TAG, "Copy failed for $sourceUri", it) }
                     .getOrDefault(CopyState.Error)
             }
