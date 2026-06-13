@@ -47,6 +47,7 @@ sealed interface CopyState {
         val originalBytes: Long,
         val finalBytes: Long,
     ) : CopyState
+    data object SilentSuccess : CopyState
     data object Error : CopyState
 }
 
@@ -55,9 +56,13 @@ private const val DISMISS_DELAY_MS = 1500L
 @Composable
 fun ConfirmationSheet(state: CopyState, onDone: () -> Unit) {
     LaunchedEffect(state) {
-        if (state !is CopyState.Pending) {
-            delay(DISMISS_DELAY_MS)
-            onDone()
+        when (state) {
+            CopyState.Pending -> Unit                // still waiting on the copy
+            CopyState.SilentSuccess -> onDone()      // close immediately, draw no card
+            is CopyState.Success, CopyState.Error -> {  // show card, then auto-dismiss
+                delay(DISMISS_DELAY_MS)
+                onDone()
+            }
         }
     }
     Box(
@@ -74,6 +79,7 @@ fun ConfirmationSheet(state: CopyState, onDone: () -> Unit) {
     ) {
         when (state) {
             CopyState.Pending -> Unit
+            CopyState.SilentSuccess -> Unit
             is CopyState.Success -> ResultCard(
                 thumbnail = state.thumbnail,
                 message = stringResource(R.string.copied_success),

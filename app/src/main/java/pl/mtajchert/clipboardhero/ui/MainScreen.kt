@@ -217,6 +217,29 @@ private fun SettingsCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .toggleable(
+                        value = settings.showConfirmation,
+                        role = Role.Switch,
+                        onValueChange = { onSettingsChange(settings.copy(showConfirmation = it)) },
+                    ),
+            ) {
+                Text(
+                    text = stringResource(R.string.show_confirmation),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f),
+                )
+                Switch(
+                    checked = settings.showConfirmation,
+                    onCheckedChange = null,
+                )
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                // Whole row is one toggle target labelled by the text; the Switch
+                // is non-focusable (onCheckedChange = null) so it isn't a second stop.
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .toggleable(
                         value = privacy.historyEnabled,
                         role = Role.Switch,
                         onValueChange = { onPrivacyChange(privacy.copy(historyEnabled = it)) },

@@ -26,6 +26,7 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
                 format = prefs[KEY_FORMAT].toEnumOrNull<OutputFormat>() ?: defaults.format,
                 quality = prefs[KEY_QUALITY]?.coerceIn(50, 100) ?: defaults.quality,
                 maxDimension = prefs[KEY_MAX_DIMENSION].toEnumOrNull<MaxDimension>() ?: defaults.maxDimension,
+                showConfirmation = prefs[KEY_SHOW_CONFIRMATION] ?: defaults.showConfirmation,
             )
         }
 
@@ -34,6 +35,7 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
             prefs[KEY_FORMAT] = settings.format.name
             prefs[KEY_QUALITY] = settings.quality
             prefs[KEY_MAX_DIMENSION] = settings.maxDimension.name
+            prefs[KEY_SHOW_CONFIRMATION] = settings.showConfirmation
         }
     }
 
@@ -63,6 +65,7 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         private val KEY_MAX_DIMENSION = stringPreferencesKey("max_dimension")
         private val KEY_HISTORY_ENABLED = booleanPreferencesKey("history_enabled")
         private val KEY_AUTO_DELETE = stringPreferencesKey("auto_delete")
+        private val KEY_SHOW_CONFIRMATION = booleanPreferencesKey("show_confirmation")
 
         private inline fun <reified T : Enum<T>> String?.toEnumOrNull(): T? =
             this?.let { name -> enumValues<T>().firstOrNull { it.name == name } }

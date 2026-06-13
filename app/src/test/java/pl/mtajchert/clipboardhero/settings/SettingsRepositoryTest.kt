@@ -99,4 +99,21 @@ class SettingsRepositoryTest {
 
         assertEquals(PrivacySettings(), repo.privacySettings.first())
     }
+
+    @Test
+    fun `showConfirmation defaults to true when nothing stored`() = runBlocking {
+        val repo = SettingsRepository(newDataStore())
+
+        assertEquals(true, repo.settings.first().showConfirmation)
+    }
+
+    @Test
+    fun `showConfirmation round-trips`() = runBlocking {
+        val repo = SettingsRepository(newDataStore())
+        val wanted = CopySettings(showConfirmation = false)
+
+        repo.update(wanted)
+
+        assertEquals(false, repo.settings.first().showConfirmation)
+    }
 }
