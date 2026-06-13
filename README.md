@@ -13,7 +13,7 @@ You'll probably never open the app itself. That's the point.
 ## Screenshots
 
 <p align="center">
-  <img src="screenshots/01-main.png" width="30%" alt="Main screen — how-to steps and copy settings" />
+  <img src="screenshots/04-share-sheet.png" width="30%" alt="Share menu showing the Copy to clipboard action" />
   <img src="screenshots/02-confirmation.png" width="30%" alt="Copied to clipboard, 2.4 MB to 284 kB" />
   <img src="screenshots/03-paste-telegram.png" width="30%" alt="Pasting copied images straight into a chat" />
 </p>
@@ -40,6 +40,15 @@ You'll probably never open the app itself. That's the point.
   optional auto-delete (1 h / 24 h / 7 d); history can be turned off entirely.
   Everything is local: no network, no analytics, **zero permissions**, and the
   image history is excluded from device backups.
+
+## The app screen
+
+You rarely open it, but when you do it's a single screen: how-to steps, copy
+settings (format / quality / max size), privacy controls, and your recent copies.
+
+<p align="center">
+  <img src="screenshots/01-main.png" width="32%" alt="Clipboard Hero main screen" />
+</p>
 
 ## Why not just use the share sheet's built-in copy?
 
