@@ -1,13 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Adaptive-icon foreground layer (transparent background). Import as the
+       foreground in Android Studio's Image Asset; use the Resize slider to fit
+       the safe zone. -->
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#15C0AE"/>
-      <stop offset="1" stop-color="#0C9A6E"/>
-    </linearGradient>
     <clipPath id="card"><rect x="192" y="192" width="206" height="206" rx="38"/></clipPath>
   </defs>
-  <!-- full-bleed square background; the launcher mask rounds corners per Android version -->
-  <rect width="512" height="512" fill="url(#bg)"/>
   <rect x="120" y="120" width="178" height="178" rx="34" fill="none" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="16"/>
   <g clip-path="url(#card)">
     <rect x="192" y="192" width="206" height="206" fill="#FFFFFF"/>
@@ -15,5 +12,4 @@
     <path d="M192 398 V356 L250 296 L300 344 L342 300 L398 356 V398 Z" fill="#0FA978"/>
     <path d="M192 398 V372 L250 320 L296 360 L344 318 L398 366 V398 Z" fill="#0B8C63"/>
   </g>
-  <rect x="192" y="192" width="206" height="206" rx="38" fill="none" stroke="#0A6E4E" stroke-opacity="0.10" stroke-width="2"/>
 </svg>
