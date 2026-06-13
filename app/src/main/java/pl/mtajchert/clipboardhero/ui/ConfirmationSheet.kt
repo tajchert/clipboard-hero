@@ -59,7 +59,7 @@ fun ConfirmationSheet(state: CopyState, onDone: () -> Unit) {
         when (state) {
             CopyState.Pending -> Unit                // still waiting on the copy
             CopyState.SilentSuccess -> onDone()      // close immediately, draw no card
-            else -> {                                // Success / Error: auto-dismiss card
+            is CopyState.Success, CopyState.Error -> {  // show card, then auto-dismiss
                 delay(DISMISS_DELAY_MS)
                 onDone()
             }
