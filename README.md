@@ -10,6 +10,18 @@ no hunting for the file later.
 
 You'll probably never open the app itself. That's the point.
 
+## Screenshots
+
+<p align="center">
+  <img src="screenshots/01-main.png" width="30%" alt="Main screen — how-to steps and copy settings" />
+  <img src="screenshots/02-confirmation.png" width="30%" alt="Copied to clipboard, 2.4 MB to 284 kB" />
+  <img src="screenshots/03-paste-telegram.png" width="30%" alt="Pasting copied images straight into a chat" />
+</p>
+
+<p align="center">
+  <em>Share an image · it's copied (and compressed) · paste it anywhere — no gallery clutter.</em>
+</p>
+
 ## Features
 
 - **Share-menu copy** — registered for `image/*` shares only; appears in the
@@ -69,8 +81,8 @@ Key design decisions:
 - **Compression never breaks the copy.** Every transformer failure (corrupt
   input, OOM, codec issues) degrades to copying the original bytes.
 
-Stack: Kotlin, Jetpack Compose (Material 3), Preferences DataStore,
-single module, minSdk 29. Settings UI lives on the one main screen.
+Stack: Kotlin, Jetpack Compose (Material 3), Hilt + MVVM, Preferences
+DataStore, single module, minSdk 29. Settings UI lives on the one main screen.
 
 ## Building
 
