@@ -13,4 +13,6 @@ data class CopySettings(
     val format: OutputFormat = OutputFormat.JPEG,
     val quality: Int = 90,
     val maxDimension: MaxDimension = MaxDimension.ORIGINAL,
+    // ON = current behavior: show the success card after a copy
+    val showConfirmation: Boolean = true,
 )
